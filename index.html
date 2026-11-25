@@ -104,6 +104,34 @@
   .themebtn:hover{border-color:var(--head);color:var(--ink)}
   .themebtn:focus-visible{outline:2px solid var(--red);outline-offset:2px}
 
+  /* star the repo */
+  .starbtn{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;
+    letter-spacing:.05em;text-decoration:none;padding:7px 12px 7px 10px;border-radius:99px;
+    border:1px solid var(--line);background:var(--card);color:var(--ink-soft);white-space:nowrap;
+    transition:border-color .15s ease,color .15s ease,background .15s ease}
+  .starbtn:hover{border-color:var(--amber);color:var(--ink)}
+  .starbtn:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+  .starbtn .star{color:var(--amber);font-size:13px;line-height:1}
+  .starbtn b{font-weight:600;color:var(--head);font-variant-numeric:tabular-nums}
+  .starbtn b:empty{display:none}
+  .starstrip{display:flex;align-items:center;justify-content:space-between;gap:18px 28px;flex-wrap:wrap;
+    padding:30px 0;border-top:1px solid var(--line)}
+  .starstrip p{margin:0;font-size:15.5px;color:var(--ink-soft);max-width:56ch}
+  .starstrip p b{color:var(--head);font-weight:600}
+  .starstrip .btn{padding:12px 18px;font-size:14.5px}
+  @media (max-width:640px){
+    .starbtn span:not(.star){display:none}
+    .starbtn{padding:7px 10px}
+    .starstrip{padding:24px 0}
+    .starstrip .btn{width:100%;justify-content:center}
+  }
+  @media (max-width:430px){
+    .nav{gap:10px}
+    .nav .starbtn{display:none}          /* el CTA del pie sigue ahí; en el nav no cabe */
+    .brand{font-size:12px;white-space:nowrap}
+    .brand span{display:none}
+  }
+
   /* hero */
   .hero{padding:64px 0 40px;border-bottom:1px solid var(--line)}
   .kicker{font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
@@ -207,6 +235,8 @@
   <nav class="nav">
     <div class="brand">CCAR-F <span>/ flashcard deck</span></div>
     <div class="nav-right">
+    <a class="starbtn" id="starBtn" href="https://github.com/argami/ccarflashcards" target="_blank" rel="noopener"
+       title="Star CCAR-F Flashcards on GitHub" aria-label="Star CCAR-F Flashcards on GitHub"><span class="star">★</span><span data-es="Estrella al repo" data-en="Star the repo">Star the repo</span><b id="starCount"></b></a>
     <button class="themebtn" id="themeBtn" aria-label="Light / dark"><span id="themeIcon">◐</span></button>
     <div class="lang" role="group" aria-label="Language">
       <button data-set="es" aria-pressed="false">ES</button>
@@ -394,6 +424,13 @@
          data-en="No. It is study material made by someone preparing for the exam. The questions are not the real exam's, although the format and difficulty imitate it.">No. It is study material made by someone preparing for the exam. The questions are not the real exam's, although the format and difficulty imitate it.</p></details>
   </section>
 
+  <section class="starstrip">
+    <p data-es-html="El mazo es gratis: <b>sin cuenta, sin upsell, sin newsletter</b>. Si te ahorra una tarde de estudio, ponle una estrella al repo en GitHub — es la única señal de que merece la pena mantenerlo al día."
+       data-en-html="The deck is free: <b>no account, no upsell, no newsletter</b>. If it saves you an afternoon of study, star the repo on GitHub — it is the only signal that keeping it current is worth it.">The deck is free: <b>no account, no upsell, no newsletter</b>. If it saves you an afternoon of study, star the repo on GitHub — it is the only signal that keeping it current is worth it.</p>
+    <a class="btn btn-ghost" id="starBtn2" href="https://github.com/argami/ccarflashcards" target="_blank" rel="noopener"
+       data-es-html="★ Estrella en GitHub" data-en-html="★ Star on GitHub">★ Star on GitHub</a>
+  </section>
+
   <footer>
     <div class="mono">CCAR-F · 347 cards · 652 verified quotes · build 2026-11-25</div>
     <div data-es="Material de estudio no oficial. Claude y Anthropic son marcas de Anthropic PBC." data-en="Unofficial study material. Claude and Anthropic are trademarks of Anthropic PBC.">Unofficial study material. Claude and Anthropic are trademarks of Anthropic PBC.</div>
@@ -432,6 +469,26 @@
   document.getElementById('themeBtn').addEventListener('click', function(){
     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
   });
+
+  // contador de estrellas del repo (API pública de GitHub, cacheado 6 h; si falla, el botón sigue funcionando)
+  (function(){
+    var K = 'ccarf_stars_v1', now = Date.now(), el = document.getElementById('starCount');
+    function paint(n){ if (n > 0) el.textContent = n; }
+    try {
+      var c = JSON.parse(localStorage.getItem(K) || 'null');
+      if (c && now - c.t < 21600000) { paint(c.n); return; }
+      if (c) paint(c.n);
+    } catch(e){}
+    if (!window.fetch) return;
+    fetch('https://api.github.com/repos/argami/ccarflashcards', {headers:{'Accept':'application/vnd.github+json'}})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if (!d || typeof d.stargazers_count !== 'number') return;
+        paint(d.stargazers_count);
+        try { localStorage.setItem(K, JSON.stringify({n:d.stargazers_count, t:Date.now()})); } catch(e){}
+      })
+      .catch(function(){});
+  })();
 
   var saved = 'en';   // idioma por defecto de la página
   try { saved = localStorage.getItem('ccarf_landing_lang') || 'en'; } catch(e){}

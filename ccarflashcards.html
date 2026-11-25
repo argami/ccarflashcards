@@ -249,6 +249,9 @@
     border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;
     display:flex;align-items:center;justify-content:center}
   /* keep Close / Guided tour reachable when the modal scrolls on a phone */
+  .tour-foot #starRepo{margin-right:auto;align-self:center;font-size:13px;color:var(--muted);
+    text-decoration:none;border-bottom:1px dotted currentColor}
+  .tour-foot #starRepo:hover{color:var(--fg)}
   .tour-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px;
     position:sticky;bottom:-1px;background:var(--bg);padding:10px 0 2px;border-top:1px solid var(--line)}
   .tour kbd{font-size:10px}
@@ -403,6 +406,7 @@
     <p class="sub" id="tourSub"></p>
     <ol id="tourSteps"></ol>
     <div class="tour-foot">
+      <a id="starRepo" href="https://github.com/argami/ccarflashcards" target="_blank" rel="noopener noreferrer"></a>
       <button id="guideStart"></button>
       <button class="primary" id="tourClose"></button>
     </div>
@@ -468,6 +472,7 @@ const T = {
       empty:"Nada que repartir con estos filtros.",inQueue:"en el mazo",seen:"vista",streak:"racha",
       best:"mejor",inFilter:"cartas en el filtro",deckOf:"de",
       report:"Informar de un fallo",reportTip:"Abre un issue en GitHub con esta carta ya rellenada",
+      repoStar:"★ Estrella al repo",repoStarTip:"Abre el repositorio en GitHub: ahí se le da la estrella",
       correct:"✅ Correcto",incorrect:(k)=>`❌ Incorrecto — la respuesta era ${k}`,
       you:"Tu respuesta",real:"Respuesta real",others:"Por qué fallan las demás",trap:"Trampa",
       scenario:"Escenario",allScen:"Escenario",selectN:"Selecciona",check:"Comprobar",
@@ -492,6 +497,7 @@ const T = {
       empty:"Nothing to deal with these filters.",inQueue:"in deck",seen:"seen",streak:"streak",
       best:"best",inFilter:"cards in filter",deckOf:"of",
       report:"Report a problem",reportTip:"Opens a GitHub issue pre-filled with this card",
+      repoStar:"★ Star the repo",repoStarTip:"Opens the repository on GitHub — that is where the star goes",
       correct:"✅ Correct",incorrect:(k)=>`❌ Incorrect — the answer was ${k}`,
       you:"Your answer",real:"Correct answer",others:"Why the others fail",trap:"Trap",
       scenario:"Scenario",allScen:"Scenario",selectN:"Select",check:"Check",
@@ -1146,6 +1152,8 @@ function openTour(){
   document.getElementById("tourSteps").innerHTML = d.steps.map(s => `<li>${s}</li>`).join("");
   document.getElementById("tourClose").textContent = t("close");
   document.getElementById("guideStart").textContent = "▸ " + t("guide");
+  const st = document.getElementById("starRepo");
+  st.textContent = t("repoStar"); st.title = t("repoStarTip");
   const tl = document.getElementById("tour");
   tl.hidden = false;
   // focusing the close button scrolled the modal to the bottom on short screens
