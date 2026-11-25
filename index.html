@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CCAR-F Flashcards — Claude Certified Architect, Foundations</title>
+<meta name="description" content="79 tarjetas de práctica bilingües para el examen CCAR-F (Claude Certified Architect – Foundations). En el navegador o para Anki.">
+<style>
+  :root{
+    --ink:#14171c; --ink-soft:#4a5260; --faint:#8b93a1;
+    --paper:#f6f4ef; --card:#fffefb; --line:#e2ddd2;
+    --navy:#1a2b47; --red:#c02f2a; --green:#1f7a52; --amber:#a86a12;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+       font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 28px}
+  .mono{font-family:var(--mono)}
+
+  /* nav */
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;
+       padding:20px 0;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:baseline;gap:10px;font-family:var(--mono);
+         font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);font-weight:600}
+  .brand span{color:var(--faint);font-weight:400}
+  .lang{display:flex;border:1px solid var(--line);border-radius:99px;overflow:hidden;background:var(--card)}
+  .lang button{font:inherit;font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+    background:none;border:0;padding:6px 12px;color:var(--faint);cursor:pointer}
+  .lang button[aria-pressed="true"]{background:var(--navy);color:#fff}
+
+  /* hero */
+  .hero{padding:64px 0 40px;border-bottom:1px solid var(--line)}
+  .kicker{font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+          color:var(--red);margin:0 0 18px}
+  h1{font-family:var(--mono);font-weight:600;font-size:clamp(29px,4.4vw,46px);line-height:1.1;
+     letter-spacing:-.02em;margin:0 0 20px;max-width:26ch;color:var(--navy);text-wrap:balance}
+  h1 em{font-style:normal;color:var(--red)}
+  .lede{font-size:clamp(16.5px,2vw,19.5px);color:var(--ink-soft);max-width:56ch;margin:0 0 28px}
+  .facts{display:flex;flex-wrap:wrap;gap:26px 34px;margin:0 0 34px;font-family:var(--mono);font-size:13px}
+  .facts div{display:flex;flex-direction:column;gap:2px}
+  .facts b{font-size:20px;font-weight:600;color:var(--navy);letter-spacing:-.01em}
+  .facts i{font-style:normal;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;font-size:10.5px}
+
+  .cta{display:flex;flex-wrap:wrap;gap:12px}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:8px;
+       text-decoration:none;font-weight:600;font-size:15.5px;border:1px solid transparent;
+       transition:transform .12s ease,background .15s ease,box-shadow .15s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--navy);color:#fff;box-shadow:0 2px 0 rgba(26,43,71,.18)}
+  .btn-primary:hover{background:#24406b}
+  .btn-ghost{background:var(--card);color:var(--navy);border-color:var(--line)}
+  .btn-ghost:hover{border-color:var(--navy)}
+  .btn small{font-family:var(--mono);font-weight:400;opacity:.7;font-size:11.5px;letter-spacing:.04em}
+
+  /* two options */
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:40px 0;border-bottom:1px solid var(--line)}
+  .opt{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 24px;
+       display:flex;flex-direction:column;gap:10px}
+  .opt h3{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+          color:var(--faint);margin:0}
+  .opt h2{margin:0;font-size:21px;letter-spacing:-.01em;color:var(--navy)}
+  .opt p{margin:0;color:var(--ink-soft);font-size:15.5px}
+  .opt .btn{margin-top:auto;align-self:flex-start}
+  .opt ul{margin-bottom:14px}
+  .opt ul{margin:4px 0 0;padding-left:18px;color:var(--ink-soft);font-size:15px}
+  .opt li{margin:3px 0}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding:38px 0;border-bottom:1px solid var(--line)}
+  .stat b{display:block;font-family:var(--mono);font-size:clamp(26px,3.6vw,38px);line-height:1;
+          color:var(--navy);letter-spacing:-.02em}
+  .stat span{display:block;margin-top:8px;font-size:13.5px;color:var(--ink-soft)}
+
+  /* inside a card */
+  section.block{padding:52px 0;border-bottom:1px solid var(--line)}
+  .h2{font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+      color:var(--red);margin:0 0 8px}
+  .h3{font-size:clamp(22px,3vw,29px);letter-spacing:-.015em;margin:0 0 14px;color:var(--navy);font-weight:600}
+  .sub{color:var(--ink-soft);max-width:62ch;margin:0 0 30px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
+  .feat .n{font-family:var(--mono);font-size:11.5px;color:var(--faint);letter-spacing:.1em}
+  .feat h4{margin:8px 0 6px;font-size:15.5px;color:var(--navy)}
+  .feat p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.55}
+
+  /* coverage */
+  .bars{margin:26px 0 0;display:flex;flex-direction:column;gap:11px}
+  .bar{display:grid;grid-template-columns:270px 1fr 30px;align-items:center;gap:16px;
+       font-family:var(--mono);font-size:12px}
+  .bar .lab{color:var(--ink-soft)}
+  .bar .lab b{color:var(--navy);font-weight:600}
+  .bar .track{display:block;height:10px;background:#e8e3d8;border-radius:99px;overflow:hidden}
+  .bar .fill{display:block;height:100%;background:var(--navy);border-radius:99px}
+  .bar .n{text-align:right;color:var(--faint)}
+  .note{margin-top:22px;padding:14px 16px;border-left:3px solid var(--amber);background:#fdf6e8;
+        border-radius:0 8px 8px 0;font-size:14.5px;color:#6b4d12}
+
+  /* how to */
+  .howto{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+  .howto h3{margin:0 0 4px;font-size:17px;color:var(--navy)}
+  .howto ol{margin:12px 0 0;padding-left:20px;color:var(--ink-soft);font-size:15px}
+  .howto ol li{margin:7px 0}
+  .howto code{font-family:var(--mono);font-size:12.5px;background:#efeae0;padding:2px 6px;border-radius:4px}
+
+  /* faq */
+  details{border-bottom:1px solid var(--line);padding:15px 0}
+  details summary{cursor:pointer;font-weight:600;color:var(--navy);font-size:16px;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"+ ";font-family:var(--mono);color:var(--red)}
+  details[open] summary::before{content:"– ";font-family:var(--mono);color:var(--red)}
+  details p{margin:10px 0 0;color:var(--ink-soft);font-size:15px}
+
+  footer{padding:34px 0 56px;color:var(--faint);font-size:13px;line-height:1.7}
+  footer a{color:var(--ink-soft)}
+  footer .mono{font-size:12px}
+
+  @media (max-width:820px){
+    .options,.howto,.grid3{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr;gap:26px}
+    .bar{grid-template-columns:1fr;gap:6px}
+    .bar .n{text-align:left}
+    .hero{padding:44px 0 32px}
+    .wrap{padding:0 20px}
+    .facts{gap:18px 26px}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="nav">
+    <div class="brand">CCAR-F <span>/ flashcard deck</span></div>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-set="es" aria-pressed="false">ES</button>
+      <button data-set="en" aria-pressed="true">EN</button>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker" data-es="Anthropic · Claude Certified Architect — Foundations · CCAR-F"
+       data-en="Anthropic · Claude Certified Architect — Foundations · CCAR-F">Anthropic · Claude Certified Architect — Foundations · CCAR-F</p>
+    <h1 data-es-html="<em>79</em> tarjetas para el examen de arquitecto de Claude"
+        data-en-html="<em>79</em> cards for the Claude architect exam"><em>79</em> cards for the Claude architect exam</h1>
+    <p class="lede"
+       data-es="Escenarios de producción, cuatro opciones, la respuesta correcta explicada y —sobre todo— por qué falla cada distractor. Todo con la cita textual del material oficial y el tip de la trampa que el examen intenta colarte. En español y en inglés."
+       data-en="Production scenarios, four options, the right answer explained and — more importantly — why every distractor fails. Each card carries a verbatim quote from the official material plus the trap tip the exam is trying to spring on you. In Spanish and English.">Production scenarios, four options, the right answer explained and — more importantly — why every distractor fails. Each card carries a verbatim quote from the official material plus the trap tip the exam is trying to spring on you. In Spanish and English.</p>
+
+    <div class="facts mono">
+      <div><b>60</b><i data-es="preguntas" data-en="questions">questions</i></div>
+      <div><b>120</b><i data-es="minutos" data-en="minutes">minutes</i></div>
+      <div><b>720/1000</b><i data-es="para aprobar" data-en="to pass">to pass</i></div>
+      <div><b>4</b><i data-es="escenarios por examen" data-en="scenarios per exam">scenarios per exam</i></div>
+    </div>
+
+    <div class="cta">
+      <a class="btn btn-primary" href="./ccarflashcards.html" target="_blank" rel="noopener"
+         data-es-html="Estudiar en el navegador →" data-en-html="Study in the browser →">Study in the browser →</a>
+      <a class="btn btn-ghost" href="./ccarflashcards.apkg" download
+         data-es-html="Descargar mazo Anki <small>424 KB</small>"
+         data-en-html="Download Anki deck <small>424 KB</small>">Download Anki deck <small>424 KB</small></a>
+    </div>
+  </header>
+
+  <section class="options">
+    <article class="opt">
+      <h3 data-es="Opción A" data-en="Option A">Option A</h3>
+      <h2 data-es="Navegador, sin instalar nada" data-en="Browser, nothing to install">Browser, nothing to install</h2>
+      <p data-es="Un único archivo HTML con las 79 tarjetas dentro. Se abre con doble clic, funciona sin conexión y guarda tu progreso en el propio navegador."
+         data-en="A single HTML file with all 79 cards inside. Double-click it, works offline, keeps your progress in the browser itself.">A single HTML file with all 79 cards inside. Double-click it, works offline, keeps your progress in the browser itself.</p>
+      <ul>
+        <li data-es="Corrección inmediata con la respuesta real" data-en="Instant grading with the real answer">Instant grading with the real answer</li>
+        <li data-es="Filtros por subdominio y por tipo de trampa" data-en="Filters by subdomain and by trap type">Filters by subdomain and by trap type</li>
+        <li data-es="Score estimado sobre 1000 y precisiones" data-en="Estimated score out of 1000 and accuracy breakdowns">Estimated score out of 1000 and accuracy breakdowns</li>
+        <li data-es="Selector ES / EN / ES+EN en cada pantalla" data-en="ES / EN / ES+EN switch on every screen">ES / EN / ES+EN switch on every screen</li>
+      </ul>
+      <a class="btn btn-primary" href="./ccarflashcards.html" target="_blank" rel="noopener"
+         data-es-html="Abrir la app" data-en-html="Open the app">Open the app</a>
+    </article>
+
+    <article class="opt">
+      <h3 data-es="Opción B" data-en="Option B">Option B</h3>
+      <h2 data-es="Anki, repaso espaciado" data-en="Anki, spaced repetition">Anki, spaced repetition</h2>
+      <p data-es="El mismo contenido como mazo de Anki (79 notas, cinco sub-mazos). Anki decide qué carta te toca cada día según lo que vas fallando: es lo que hace que se quede."
+         data-en="The same content as an Anki deck (79 notes, five sub-decks). Anki schedules each day based on what you keep getting wrong — that is what makes it stick.">The same content as an Anki deck (79 notes, five sub-decks). Anki schedules each day based on what you keep getting wrong — that is what makes it stick.</p>
+      <ul>
+        <li data-es="Escritorio y Android gratis; iOS de pago (AnkiMobile)" data-en="Desktop and Android free; iOS paid (AnkiMobile)">Desktop and Android free; iOS paid (AnkiMobile)</li>
+        <li data-es="Sincroniza entre móvil y ordenador con una cuenta AnkiWeb" data-en="Syncs across phone and laptop with a free AnkiWeb account">Syncs across phone and laptop with a free AnkiWeb account</li>
+        <li data-es="Reverso con conmutador Español / English / ambos" data-en="Card back with a Spanish / English / both switch">Card back with a Spanish / English / both switch</li>
+        <li data-es="Importas el archivo y aparece el mazo CCAR-F" data-en="Import the file and the CCAR-F deck shows up">Import the file and the CCAR-F deck shows up</li>
+      </ul>
+      <a class="btn btn-ghost" href="./ccarflashcards.apkg" download
+         data-es-html="Descargar .apkg <small>424 KB</small>" data-en-html="Download .apkg <small>424 KB</small>">Download .apkg <small>424 KB</small></a>
+    </article>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><b>79</b><span data-es="tarjetas en el mazo" data-en="cards in the deck">cards in the deck</span></div>
+    <div class="stat"><b>124</b><span data-es="citas verificadas carácter a carácter" data-en="quotes verified character by character">quotes verified character by character</span></div>
+    <div class="stat"><b>7/7</b><span data-es="subdominios del Dominio 1" data-en="Domain 1 subdomains">Domain 1 subdomains</span></div>
+    <div class="stat"><b>2</b><span data-es="idiomas en cada explicación" data-en="languages per explanation">languages per explanation</span></div>
+  </section>
+
+  <section class="block">
+    <p class="h2" data-es="Anatomía de una tarjeta" data-en="Anatomy of a card">Anatomy of a card</p>
+    <h2 class="h3" data-es="No es un test. Es el motivo por el que fallarías." data-en="It is not a quiz. It is the reason you would fail.">It is not a quiz. It is the reason you would fail.</h2>
+    <p class="sub" data-es="Cada tarjeta reproduce el formato del examen real —escenario de producción, una pregunta, cuatro opciones plausibles— y luego se abre en capas hasta el texto fuente."
+       data-en="Every card reproduces the real exam format — a production scenario, one question, four plausible options — then opens up in layers down to the source text.">Every card reproduces the real exam format — a production scenario, one question, four plausible options — then opens up in layers down to the source text.</p>
+    <div class="grid3">
+      <div class="feat"><div class="n mono">01</div>
+        <h4 data-es="Escenario, no definición" data-en="Scenario, not definition">Scenario, not definition</h4>
+        <p data-es="Un sistema real, algo que se rompe y una decisión pendiente. La media ronda las 60 palabras de contexto."
+           data-en="A real system, something breaking, a decision pending. Roughly 60 words of context on average.">A real system, something breaking, a decision pending. Roughly 60 words of context on average.</p></div>
+      <div class="feat"><div class="n mono">02</div>
+        <h4 data-es="Por qué falla cada distractor" data-en="Why each distractor fails">Why each distractor fails</h4>
+        <p data-es="Las tres opciones incorrectas llevan su propia explicación. Aprender por qué algo parece razonable es lo que separa el 700 del 800."
+           data-en="All three wrong options get their own explanation. Learning why something looks reasonable is what separates 700 from 800.">All three wrong options get their own explanation. Learning why something looks reasonable is what separates 700 from 800.</p></div>
+      <div class="feat"><div class="n mono">03</div>
+        <h4 data-es="Tip de trampa" data-en="Trap tip">Trap tip</h4>
+        <p data-es="Cada carta está etiquetada con una de ocho trampas clásicas (límite de iteraciones, herencia de contexto, prompt en vez de código…) y cómo reconocerla en cinco segundos."
+           data-en="Each card is tagged with one of eight classic traps (iteration cap, context inheritance, prompt instead of code…) and how to spot it in five seconds.">Each card is tagged with one of eight classic traps (iteration cap, context inheritance, prompt instead of code…) and how to spot it in five seconds.</p></div>
+      <div class="feat"><div class="n mono">04</div>
+        <h4 data-es="Cita textual, no resumen" data-en="Verbatim quote, not a summary">Verbatim quote, not a summary</h4>
+        <p data-es="124 citas de 15 a 40 palabras extraídas literalmente de la guía oficial y de las 30 lecciones. El build rechaza cualquier paráfrasis."
+           data-en="124 quotes of 15 to 40 words lifted literally from the official exam guide and the 30 lessons. The build rejects any paraphrase.">124 quotes of 15 to 40 words lifted literally from the official exam guide and the 30 lessons. The build rejects any paraphrase.</p></div>
+      <div class="feat"><div class="n mono">05</div>
+        <h4 data-es="Bilingüe de verdad" data-en="Genuinely bilingual">Genuinely bilingual</h4>
+        <p data-es="Pregunta y opciones en inglés, como el examen. Explicación en español y en inglés, con paridad medida: 72 500 frente a 71 600 caracteres."
+           data-en="Question and options in English, like the exam. Explanation in Spanish and English, with measured parity: 72,500 versus 71,600 characters.">Question and options in English, like the exam. Explanation in Spanish and English, with measured parity: 72,500 versus 71,600 characters.</p></div>
+      <div class="feat"><div class="n mono">06</div>
+        <h4 data-es="Preguntas reales incluidas" data-en="Real questions included">Real questions included</h4>
+        <p data-es="12 preguntas de un banco real de examen, enriquecidas sin tocar enunciado ni respuesta correcta, marcadas como set de referencia."
+           data-en="12 questions from a real exam bank, enriched without touching the wording or the correct answer, marked as a reference set.">12 questions from a real exam bank, enriched without touching the wording or the correct answer, marked as a reference set.</p></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <p class="h2" data-es="Cobertura" data-en="Coverage">Coverage</p>
+    <h2 class="h3" data-es="Dominio 1 completo, los otros cuatro en camino" data-en="Domain 1 complete, the other four on the way">Domain 1 complete, the other four on the way</h2>
+    <p class="sub" data-es="El examen pesa 27% en Arquitectura y Orquestación de Agentes, el bloque más grande. Está cubierto entero, con entre 9 y 14 tarjetas por subdominio."
+       data-en="The exam weights Agentic Architecture and Orchestration at 27%, the largest block. It is fully covered, with 9 to 14 cards per subdomain.">The exam weights Agentic Architecture and Orchestration at 27%, the largest block. It is fully covered, with 9 to 14 cards per subdomain.</p>
+    <div class="bars"><div class="bar"><span class="lab"><b>1.1</b> · Agentic loops</span><span class="track"><span class="fill" style="width:100.0%"></span></span><span class="n">14</span></div>
+      <div class="bar"><span class="lab"><b>1.2</b> · Orchestration patterns</span><span class="track"><span class="fill" style="width:71.4%"></span></span><span class="n">10</span></div>
+      <div class="bar"><span class="lab"><b>1.3</b> · Subagent invocation & context</span><span class="track"><span class="fill" style="width:85.7%"></span></span><span class="n">12</span></div>
+      <div class="bar"><span class="lab"><b>1.4</b> · Workflow enforcement & handoff</span><span class="track"><span class="fill" style="width:71.4%"></span></span><span class="n">10</span></div>
+      <div class="bar"><span class="lab"><b>1.5</b> · Agent SDK hooks</span><span class="track"><span class="fill" style="width:100.0%"></span></span><span class="n">14</span></div>
+      <div class="bar"><span class="lab"><b>1.6</b> · Task decomposition</span><span class="track"><span class="fill" style="width:64.3%"></span></span><span class="n">9</span></div>
+      <div class="bar"><span class="lab"><b>1.7</b> · Session state & resumption</span><span class="track"><span class="fill" style="width:71.4%"></span></span><span class="n">10</span></div></div>
+    <div class="note" data-es-html="<b>En construcción:</b> Dominio 2 (Tool Design &amp; MCP), 3 (Claude Code), 4 (Prompt Engineering) y 5 (Context &amp; Reliability). El HTML y el mazo se regeneran solos cuando cada dominio pasa la validación."
+         data-en-html="<b>Work in progress:</b> Domain 2 (Tool Design &amp; MCP), 3 (Claude Code), 4 (Prompt Engineering) and 5 (Context &amp; Reliability). The HTML and the deck rebuild themselves as each domain passes validation."><b>Work in progress:</b> Domain 2 (Tool Design &amp; MCP), 3 (Claude Code), 4 (Prompt Engineering) and 5 (Context &amp; Reliability). The HTML and the deck rebuild themselves as each domain passes validation.</div>
+  </section>
+
+  <section class="block">
+    <p class="h2" data-es="Cómo se usa" data-en="How to use it">How to use it</p>
+    <h2 class="h3" data-es="Dos caminos, mismo contenido" data-en="Two paths, same content">Two paths, same content</h2>
+    <div class="howto">
+      <div>
+        <h3 data-es="En el navegador" data-en="In the browser">In the browser</h3>
+        <ol>
+          <li data-es-html="Descarga <code>ccarflashcards.html</code> y ábrelo con doble clic." data-en-html="Download <code>ccarflashcards.html</code> and double-click it.">Download <code>ccarflashcards.html</code> and double-click it.</li>
+          <li data-es="Responde con el teclado (1–4) o con el ratón. Espacio para pasar a la siguiente."
+              data-en="Answer with the keyboard (1–4) or the mouse. Space for the next card.">Answer with the keyboard (1–4) or the mouse. Space for the next card.</li>
+          <li data-es="Tu progreso queda en ese navegador. Si cambias de ordenador, empiezas de cero."
+              data-en="Your progress stays in that browser. On another machine you start from zero.">Your progress stays in that browser. On another machine you start from zero.</li>
+        </ol>
+      </div>
+      <div>
+        <h3 data-es="En Anki" data-en="In Anki">In Anki</h3>
+        <ol>
+          <li data-es-html="Instala Anki (escritorio o AnkiDroid, gratis) y abre <code>Archivo → Importar</code>."
+              data-en-html="Install Anki (desktop or AnkiDroid, both free) and open <code>File → Import</code>.">Install Anki (desktop or AnkiDroid, both free) and open <code>File → Import</code>.</li>
+          <li data-es="Elige el .apkg descargado. Aparece el mazo CCAR-F con cinco sub-mazos."
+              data-en="Pick the downloaded .apkg. The CCAR-F deck appears with five sub-decks.">Pick the downloaded .apkg. The CCAR-F deck appears with five sub-decks.</li>
+          <li data-es="Estudia un rato cada día. Anki decide cuánto vuelve y cuándo; tú solo respondes."
+              data-en="Study a little every day. Anki decides what comes back and when; you just answer.">Study a little every day. Anki decides what comes back and when; you just answer.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="border-bottom:0">
+    <p class="h2" data-es="Preguntas rápidas" data-en="Quick answers">Quick answers</p>
+    <details><summary data-es="¿Necesito cuenta o conexión?" data-en="Do I need an account or a connection?">Do I need an account or a connection?</summary>
+      <p data-es="No. El HTML es un único archivo autónomo: no llama a ningún servidor, no carga tipografías externas y funciona en avión. Solo AnkiWeb, si quieres sincronizar, pide cuenta."
+         data-en="No. The HTML is one self-contained file: it calls no server, loads no external fonts and works on a plane. Only AnkiWeb asks for an account, and only if you want to sync.">No. The HTML is one self-contained file: it calls no server, loads no external fonts and works on a plane. Only AnkiWeb asks for an account, and only if you want to sync.</p></details>
+    <details><summary data-es="¿Se guarda mi progreso si borro el archivo?" data-en="Does my progress survive if I delete the file?">Does my progress survive if I delete the file?</summary>
+      <p data-es="El progreso vive en el navegador, no en el archivo. Borrar el HTML no lo borra; abrirlo en otro navegador sí empieza vacío. En Anki el progreso está en tu colección."
+         data-en="Progress lives in the browser, not in the file. Deleting the HTML does not delete it; opening it in another browser does start empty. In Anki your progress is in your collection.">Progress lives in the browser, not in the file. Deleting the HTML does not delete it; opening it in another browser does start empty. In Anki your progress is in your collection.</p></details>
+    <details><summary data-es="¿De dónde salen las citas?" data-en="Where do the quotes come from?">Where do the quotes come from?</summary>
+      <p data-es="De la guía oficial del examen (CCAR-F, versión 1.0) y de las 30 lecciones públicas del programa. Cada cita es un fragmento literal de entre 15 y 40 palabras y el script de validación comprueba que existe tal cual antes de construir."
+         data-en="From the official exam guide (CCAR-F, version 1.0) and the 30 public lessons in the syllabus. Every quote is a literal 15-to-40-word fragment and the validation script confirms it exists verbatim before the build.">From the official exam guide (CCAR-F, version 1.0) and the 30 public lessons in the syllabus. Every quote is a literal 15-to-40-word fragment and the validation script confirms it exists verbatim before the build.</p></details>
+    <details><summary data-es="¿Es material oficial de Anthropic?" data-en="Is this official Anthropic material?">Is this official Anthropic material?</summary>
+      <p data-es="No. Es material de estudio hecho por una persona que se está preparando el examen. Las preguntas no son las del examen real, aunque el formato y el nivel de dificultad imiten al oficial."
+         data-en="No. It is study material made by someone preparing for the exam. The questions are not the real exam's, although the format and difficulty imitate it.">No. It is study material made by someone preparing for the exam. The questions are not the real exam's, although the format and difficulty imitate it.</p></details>
+  </section>
+
+  <footer>
+    <div class="mono">CCAR-F · 79 cards · 124 verified quotes · build 2026-11-25</div>
+    <div data-es="Material de estudio no oficial. Claude y Anthropic son marcas de Anthropic PBC." data-en="Unofficial study material. Claude and Anthropic are trademarks of Anthropic PBC.">Unofficial study material. Claude and Anthropic are trademarks of Anthropic PBC.</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var T = document.querySelectorAll('[data-es],[data-en],[data-es-html],[data-en-html]');
+  function set(lang){
+    T.forEach(function(el){
+      var h = el.getAttribute('data-'+lang+'-html');
+      if (h !== null) el.innerHTML = h;
+      var t = el.getAttribute('data-'+lang);
+      if (t !== null) el.textContent = t;
+    });
+    document.documentElement.lang = lang;
+    document.querySelectorAll('.lang button').forEach(function(b){
+      b.setAttribute('aria-pressed', b.dataset.set === lang);
+    });
+    try { localStorage.setItem('ccarf_landing_lang', lang); } catch(e){}
+  }
+  document.querySelectorAll('.lang button').forEach(function(b){
+    b.addEventListener('click', function(){ set(b.dataset.set); });
+  });
+  var saved = 'en';   // idioma por defecto de la página
+  try { saved = localStorage.getItem('ccarf_landing_lang') || 'en'; } catch(e){}
+  set(saved);
+})();
+</script>
+</body>
+</html>
