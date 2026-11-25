@@ -34,9 +34,15 @@ The ☰ menu holds the views (Study / Progress / All / **Failed** — everything
 first), the **Help** modal (also on the `?` button in the header, and shown automatically the first time you
 open the app) with a guided step-by-step tour, the ES / EN / ES+EN language switch and the light / dark theme.
 Controls sit **above** the card — back, repeat, star, next — so you never scroll past the explanation to move
-on; `space` also advances. All three choices — language, theme, filters, deck position — persist in
-`localStorage` for that browser. It does not sync between devices and clearing site data resets it.
-Per-card scheduling is a Leitner ladder (0-1-3-7-16 days).
+on; `space` also advances. Language, theme, filters and deck position persist in `localStorage` for that
+browser, and per-card scheduling is a Leitner ladder (0-1-3-7-16 days).
+
+**Across devices, without an account.** The ☰ menu has **Sync**: it gives you a code like `XXXXX-XXXXX`
+(10 characters, no email, no password). Paste that code in the same app on another browser and both stay
+in step — progress, stars, the deck in play and your settings. Writes go up 5 seconds after you answer
+something; the service merges the two sides instead of overwriting, so nothing is lost. The code is the
+only credential: no code, no recovery. Everything still works offline — sync is a bonus layer, and
+clearing site data on every browser still resets it.
 
 **In Anki.** Import `ccarflashcards.apkg` (Anki desktop, AnkiDroid, AnkiMobile, AnkiWeb — all free).
 You get real spaced repetition scheduling and sync across devices, at the cost of needing an app.

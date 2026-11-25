@@ -255,6 +255,20 @@
   .tour-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px;
     position:sticky;bottom:-1px;background:var(--bg);padding:10px 0 2px;border-top:1px solid var(--line)}
   .tour kbd{font-size:10px}
+  /* sync dialog */
+  .syncrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 4px}
+  .syncrow input{flex:1 1 170px;min-width:0;font:inherit;font-size:15px;letter-spacing:.14em;
+    padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);
+    text-transform:uppercase;font-variant-numeric:tabular-nums}
+  .syncrow input:focus{outline:none;border-color:var(--accent)}
+  .synccode{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:20px;letter-spacing:.2em;
+    background:var(--panel);border:1px dashed var(--line);border-radius:8px;padding:12px 14px;
+    text-align:center;margin:12px 0 6px;user-select:all;color:var(--fg)}
+  .syncstat{font-size:12.5px;color:var(--muted);margin:8px 0 0;min-height:1.2em}
+  .syncstat b{color:var(--fg)}
+  .syncstat .bad{color:var(--red)}
+  .syncstat .ok{color:var(--green)}
+  .synchelp{font-size:12.5px;color:var(--muted);margin:14px 0 0;line-height:1.5}
   footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--line);
     font-size:11px;color:var(--muted);padding:7px 18px;display:flex;justify-content:space-between;gap:12px}
   @media(max-width:640px){
@@ -364,6 +378,9 @@
           <button class="menu-item" id="tourBtn" role="menuitem"><span data-lbl="help"></span><span class="tick">?</span></button>
         </div>
         <div class="menu-sec">
+          <button class="menu-item" id="syncBtn" role="menuitem"><span data-lbl="sync"></span><span class="tick" id="syncTick"></span></button>
+        </div>
+        <div class="menu-sec">
           <div class="menu-lbl" id="mLblTheme"></div>
           <div class="seg" id="themeseg">
             <button data-theme="light"></button><button data-theme="dark"></button>
@@ -409,6 +426,17 @@
       <a id="starRepo" href="https://github.com/argami/ccarflashcards" target="_blank" rel="noopener noreferrer"></a>
       <button id="guideStart"></button>
       <button class="primary" id="tourClose"></button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="syncdlg" hidden role="dialog" aria-modal="true" aria-labelledby="syncTitle">
+  <div class="tour">
+    <h2 id="syncTitle"></h2>
+    <p class="sub" id="syncSub"></p>
+    <div id="syncBody"></div>
+    <div class="tour-foot">
+      <button id="syncNew"></button>
+      <button class="primary" id="syncClose"></button>
     </div>
   </div>
 </div>
@@ -489,6 +517,19 @@ const T = {
       deckDone:"Mazo completado",deckAcc:"Aciertos del mazo",newDeck:"Repartir otro mazo de 60",
       all:"Todos",clear:"Quitar",keys:"responder · espacio siguiente",filterHint:"Sin selección = todo",
       keysFull:"responder · espacio siguiente · ← atrás",
+      sync:"Sincronizar", syncTitle:"Sincronizar entre navegadores",
+      syncNoCode:"Sin código: el progreso vive solo en este navegador.",
+      syncSub:"Sin cuentas: un código y ya",
+      syncNew:"Crear código", syncOther:"Usar otro código", syncCopy:"Copiar", syncNow:"Sincronizar ahora",
+      syncForget:"Olvidar", syncForgetQ:"¿Olvidar el código en este navegador? El progreso guardado en el servicio no se borra, pero tendrás que volver a pegar el código.",
+      syncSave:"Guardar código", syncJoin:"Pega aquí el código del otro navegador y pulsa Guardar.",
+      syncHave:"Pega este código en el otro navegador para seguir donde lo dejaste.",
+      syncNever:"Todavía no se ha sincronizado",
+      syncBusy:"Sincronizando…", syncAgo:"Sincronizado hace ", syncNowAgo:"ahora mismo",
+      syncErr:"No se pudo sincronizar", syncOffline:"Sin conexión; se reintentará solo.",
+      syncBadCode:"Código no válido: son 10 caracteres (letras y números).",
+      syncCopied:"Copiado", syncWhat:"Se sincroniza todo: el estado de las 347 preguntas, las marcadas, el mazo abierto y los ajustes (tema, idioma, filtros).",
+      syncNoService:"Servicio no configurado en esta copia.",
       kicker:"Claude Certified Architect — Foundations · 720/1000 para aprobar"},
   en:{study:"Study",stats:"Progress",browse:"All",menu:"Menu",go:"Go to",language:"Language",
       theme:"Theme",light:"Light",dark:"Dark",
@@ -514,6 +555,19 @@ const T = {
       deckDone:"Deck complete",deckAcc:"Cards correct in this deck",newDeck:"Deal another 60",
       all:"All",clear:"Clear",keys:"answer · space for next",filterHint:"Nothing selected = everything",
       keysFull:"answer · space for next · ← back",
+      sync:"Sync", syncTitle:"Sync between browsers",
+      syncNoCode:"No code yet: progress lives only in this browser.",
+      syncSub:"No accounts: just a code",
+      syncNew:"Create code", syncOther:"Use another code", syncCopy:"Copy", syncNow:"Sync now",
+      syncForget:"Forget", syncForgetQ:"Forget the code on this browser? The progress stored in the service is not deleted, but you will have to paste the code again.",
+      syncSave:"Save code", syncJoin:"Paste the code from your other browser here and press Save.",
+      syncHave:"Paste this code in your other browser to pick up where you left off.",
+      syncNever:"Never synced yet",
+      syncBusy:"Syncing…", syncAgo:"Synced ", syncNowAgo:"just now",
+      syncErr:"Could not sync", syncOffline:"Offline; it will retry by itself.",
+      syncBadCode:"That code is not valid: 10 characters (letters and digits).",
+      syncCopied:"Copied", syncWhat:"Everything syncs: the state of all 347 questions, the starred ones, the current deck and your settings (theme, language, filters).",
+      syncNoService:"Service not configured in this copy.",
       kicker:"Claude Certified Architect — Foundations · 720/1000 to pass"}
 };
 const t  = k => (lang === "en" ? T.en : T.es)[k];
@@ -568,14 +622,14 @@ function loadDeck(){
   }catch(e){}
   return null;
 }
-function saveDeck(){ localStorage.setItem(DKEY, JSON.stringify(deck)); }
+function saveDeck(){ localStorage.setItem(DKEY, JSON.stringify(deck)); queueSync(); }
 
 const SKEY = "ccarf_stars_v1";
 let stars = new Set();
 try{ stars = new Set(JSON.parse(localStorage.getItem(SKEY) || "[]")); }catch(e){}
 function toggleStar(id){
   stars.has(id) ? stars.delete(id) : stars.add(id);
-  localStorage.setItem(SKEY, JSON.stringify([...stars]));
+  localStorage.setItem(SKEY, JSON.stringify([...stars])); queueSync();
 }
 
 function filters(){
@@ -847,10 +901,10 @@ document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => {
   paintMenu(); paintFilters(); render();
 });
 document.querySelectorAll("#langseg button").forEach(b => b.onclick = () => {
-  lang = b.dataset.lang; localStorage.setItem(LKEY, lang); paintMenu(); paintFilters(); render();
+  lang = b.dataset.lang; localStorage.setItem(LKEY, lang); touchSettings(); paintMenu(); paintFilters(); render();
 });
 document.querySelectorAll("#themeseg button").forEach(b => b.onclick = () => {
-  theme = b.dataset.theme; applyTheme(); paintMenu(); render();
+  theme = b.dataset.theme; applyTheme(); touchSettings(); paintMenu(); render();
 });
 
 /* ---------- study ---------- */
@@ -989,7 +1043,7 @@ function recordAnswer(c, picked){
   r.seen++;
   if(ok){ r.ok++; state.streak++; state.best = Math.max(state.best, state.streak); }
   else { r.bad++; state.streak = 0; }
-  save();
+  save(); queueSync();
   render();
 }
 function pick(k){
@@ -1061,7 +1115,7 @@ function renderStats(el){
     <div class="rows">${rowsOf(byTrap) || `<div class="cite">${t("noData")}</div>`}</div>
     <div style="margin-top:26px"><button id="reset">${t("reset")}</button></div>`;
   document.getElementById("reset").onclick = () => {
-    if(confirm(t("confirmReset"))){ state={cards:{},streak:0,best:0}; save(); deck.answers={}; saveDeck(); render(); }
+    if(confirm(t("confirmReset"))){ state={cards:{},streak:0,best:0}; save(); deck.answers={}; saveDeck(); queueSync(); render(); }
   };
   document.getElementById("foot").textContent = `${DATA.cards.length} ${t("total")}`;
 }
@@ -1163,6 +1217,7 @@ function openTour(){
 function closeTour(){
   document.getElementById("tour").hidden = true;
   try{ localStorage.setItem(TOURKEY, "done"); }catch(e){}
+  touchSettings();
 }
 function openHelp(){
   const p = document.getElementById("menuPanel");
@@ -1175,7 +1230,7 @@ document.getElementById("tourBtn").onclick = openHelp;
 document.getElementById("helpBtn").onclick = openHelp;
 document.getElementById("themeBtn").onclick = () => {
   theme = theme === "dark" ? "light" : "dark";
-  applyTheme(); paintMenu(); render();
+  applyTheme(); touchSettings(); paintMenu(); render();
 };
 document.getElementById("tour").addEventListener("click", e => { if(e.target.id === "tour") closeTour(); });
 
@@ -1254,6 +1309,319 @@ function endGuide(){
 document.getElementById("guideStart").onclick = startGuide;
 addEventListener("resize", () => { if(guideOn) showStep(); });
 
+/* ---------- sync: mismo progreso en varios navegadores ---------- */
+/* Servicio: sync/worker.js (Cloudflare Workers + KV). El código es la única
+   credencial y es aleatorio: 10 caracteres en base32 de Crockford. */
+const SYNCKEY = "ccarf_sync_v1";          // {code, rev, last, err}
+const STSKEY  = "ccarf_settings_ts_v1";   // cuándo cambió un ajuste por última vez
+const SYNC_BASE = "https://ccarf-sync.ccarflashcards.workers.dev";                     // se rellena cuando el Worker está desplegado
+
+function saveDeckSilent(){ try{ localStorage.setItem(DKEY, JSON.stringify(deck)); }catch(e){} }
+function syncBase(){
+  return SYNC_BASE || (function(){ try{ return localStorage.getItem("ccarf_sync_base") || ""; }catch(e){ return ""; } })();
+}
+function syncState(){
+  try{ return JSON.parse(localStorage.getItem(SYNCKEY)) || {}; }catch(e){ return {}; }
+}
+let sync = syncState();
+function saveSync(){ try{ localStorage.setItem(SYNCKEY, JSON.stringify(sync)); }catch(e){} }
+function settingsTs(){ try{ return Number(localStorage.getItem(STSKEY)) || 0; }catch(e){ return 0; } }
+function touchSettings(){ try{ localStorage.setItem(STSKEY, String(Date.now())); }catch(e){} queueSync(); }
+
+/* huella del mazo: si cambia el conjunto de cartas, un estado posicional ya no vale */
+function deckFp(){
+  const str = DATA.cards.map(c => c.id).sort().join("|");
+  let h = 0x811c9dc5;
+  for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16).padStart(8, "0");
+}
+
+/* ver una carta crea un registro vacío (rec()); no viaja: solo lo contestado */
+function compactCards(cards){
+  const out = {};
+  for(const id in (cards || {})){
+    const r = cards[id];
+    if(r && (((r.ok | 0) + (r.bad | 0)) > 0 || (r.box | 0) > 0)) out[id] = r;
+  }
+  return out;
+}
+function snapKey(s){
+  if(!s) return "";
+  const d = s.deck || {};
+  const cards = Object.keys(s.cards || {}).sort().map(k => [k, s.cards[k].ok | 0, s.cards[k].bad | 0]);
+  return JSON.stringify({ c:cards, s:[...(s.stars || [])].sort(), b:s.best | 0, k:s.streak | 0,
+    d:[d.ids || [], d.idx | 0, d.answers || {}], t:s.set || {} });
+}
+
+function snap(){
+  return { v:1, fp:deckFp(), ts:Date.now(), sts:settingsTs(),
+    cards:compactCards(state.cards), streak:state.streak, best:state.best, stars:[...stars],
+    deck:{ ids:[...deck.ids], idx:deck.idx, answers:deck.answers || {}, f:deck.f, created:deck.created || 0 },
+    set:{ theme, lang, tour:(function(){ try{ return localStorage.getItem(TOURKEY) || ""; }catch(e){ return ""; } })() } };
+}
+
+function applySnap(s){
+  if(!s || typeof s !== "object") return;
+  if(s.cards && typeof s.cards === "object") state.cards = s.cards;
+  state.streak = Number(s.streak) || 0;
+  state.best   = Math.max(Number(state.best) || 0, Number(s.best) || 0);
+  if(Array.isArray(s.stars)){ stars = new Set(s.stars); try{ localStorage.setItem(SKEY, JSON.stringify([...stars])); }catch(e){} }
+  let setLang = false;
+  if(s.set && typeof s.set === "object"){
+    if(s.set.theme && s.set.theme !== theme){ theme = s.set.theme; }
+    if(s.set.lang && s.set.lang !== lang){ lang = s.set.lang; setLang = true; }
+    try{
+      localStorage.setItem(TKEY, theme); localStorage.setItem(LKEY, lang);
+      if(s.set.tour) localStorage.setItem(TOURKEY, s.set.tour);
+      if(s.sts) localStorage.setItem(STSKEY, String(Math.max(settingsTs(), Number(s.sts) || 0)));
+    }catch(e){}
+  }
+  if(s.deck && Array.isArray(s.deck.ids) && s.fp === deckFp()){
+    const keep = s.deck.ids.filter(id => byId[id]);
+    if(keep.length){
+      deck = { ids:keep, idx:Math.min(Number(s.deck.idx) || 0, keep.length - 1),
+               answers:s.deck.answers || {}, f:s.deck.f || filters(), created:s.deck.created || 0 };
+      saveDeckSilent();
+    }
+  }
+  applyTheme();
+  save();
+  if(setLang){
+    paintMenu(); paintFilters();
+    const d = document.getElementById("syncdlg");
+    if(d && !d.hidden) paintSync();
+  }
+  const cc = curCard();
+  view.picked = cc && deck.answers ? (deck.answers[cc.id] || null) : null;
+  view.answered = !!view.picked;
+}
+
+/* merge conmutativo: max() de contadores, unión de marcadas, ajustes más nuevos */
+function mergeSnap(a, b){
+  const out = JSON.parse(JSON.stringify(a));
+  const cards = {};
+  const ids = new Set([...Object.keys(a.cards || {}), ...Object.keys(b.cards || {})]);
+  ids.forEach(id => {
+    const x = (a.cards || {})[id] || {}, y = (b.cards || {})[id] || {};
+    const ok = Math.max(x.ok | 0, y.ok | 0), bad = Math.max(x.bad | 0, y.bad | 0);
+    cards[id] = { box:Math.max(x.box | 0, y.box | 0),
+                  due:Math.max(Number(x.due) || 0, Number(y.due) || 0),
+                  seen:ok + bad, ok, bad };
+  });
+  out.cards = compactCards(cards);
+  out.stars = [...new Set([...(a.stars || []), ...(b.stars || [])])];
+  out.best = Math.max(a.best | 0, b.best | 0);
+  out.streak = (Number(b.ts) || 0) > (Number(a.ts) || 0) ? (b.streak | 0) : (a.streak | 0);
+  out.set = (Number(b.sts) || 0) > (Number(a.sts) || 0) ? b.set : a.set;
+  out.sts = Math.max(Number(a.sts) || 0, Number(b.sts) || 0);
+  const da = a.deck || {}, db = b.deck || {};
+  const na = Object.keys(da.answers || {}).length, nb = Object.keys(db.answers || {}).length;
+  // el mazo con más respuestas manda: un navegador recién abierto no debe pisar el del otro
+  out.deck = nb > na ? db : na > nb ? da
+    : ((Number(db.created) || 0) > (Number(da.created) || 0) ? db : da);
+  out.ts = Date.now();
+  out.fp = deckFp();
+  out.v = 1;
+  return out;
+}
+
+async function syncPull(){
+  const base = syncBase(); if(!base || !sync.code) return null;
+  const r = await fetch(base + "/s/" + sync.code, { cache:"no-store" });
+  if(r.status === 404) return { rev:0, payload:null };
+  if(!r.ok) throw new Error("HTTP " + r.status);
+  const j = await r.json();
+  return { rev:j.rev | 0, payload:j.payload || null };
+}
+async function syncPush(rev, payload){
+  const base = syncBase();
+  const r = await fetch(base + "/s/" + sync.code, {
+    method:"PUT", headers:{ "content-type":"application/json" }, cache:"no-store",
+    body:JSON.stringify({ rev, payload }),
+  });
+  if(r.status === 409){
+    const j = await r.json().catch(() => ({}));
+    return { conflict:true, rev:j.rev | 0 };
+  }
+  if(!r.ok) throw new Error("HTTP " + r.status);
+  const j = await r.json();
+  return { rev:j.rev | 0 };
+}
+
+let syncBusy = false;
+let syncDirty = false;
+async function syncOnce(manual){
+  if(!sync.code) { if(manual) paintSync(); return false; }
+  if(!syncBase()){ sync.err = "noservice"; saveSync(); paintSync(); return false; }
+  if(syncBusy) return false;
+  syncBusy = true; sync.err = ""; paintSyncStat();
+  try{
+    for(let attempt = 0; attempt < 3; attempt++){
+      const remote = await syncPull();
+      let local = snap();
+      const before = remote && remote.payload ? snapKey(remote.payload) : "";
+      if(remote && remote.payload){
+        local = mergeSnap(local, remote.payload);
+        applySnap(local);
+      }
+      if(before && !syncDirty && snapKey(local) === before){
+        sync.rev = remote.rev; sync.last = Date.now(); sync.err = "";
+        saveSync(); syncBusy = false; paintSyncStat(); paintSyncTick();
+        return true;
+      }
+      const res = await syncPush(remote ? remote.rev : 0, local);
+      if(res.conflict){ continue; }
+      sync.rev = res.rev; sync.last = Date.now(); sync.err = ""; syncDirty = false;
+      saveSync(); syncBusy = false;
+      paintSyncStat(); paintSyncTick(); render();
+      return true;
+    }
+    sync.err = "conflict"; saveSync();
+  }catch(e){
+    sync.err = (e && e.message === "Failed to fetch") ? "offline" : String((e && e.message) || e);
+    saveSync();
+  }
+  syncBusy = false;
+  paintSyncStat(); paintSyncTick();
+  return false;
+}
+
+let syncTimer = null;
+function queueSync(){
+  try{
+    if(!sync || !sync.code) return;
+    syncDirty = true;
+    if(syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => { syncTimer = null; syncOnce(false); }, 5000);
+  }catch(e){}
+}
+/* al cerrar la pestaña: no esperamos el debounce */
+addEventListener("pagehide", () => {
+  if(!sync.code || !syncDirty) return;
+  try{
+    const body = JSON.stringify({ rev:sync.rev | 0, payload:snap() });
+    fetch(syncBase() + "/s/" + sync.code, { method:"PUT", headers:{ "content-type":"application/json" },
+      body, keepalive:true }).catch(() => {});
+  }catch(e){}
+});
+
+function syncCodeFmt(code){ return code.slice(0, 5) + "-" + code.slice(5); }
+function syncCodeNorm(v){
+  return String(v || "").toUpperCase()
+    .replace(/[^0-9A-Z]/g, "")
+    .replace(/O/g, "0").replace(/[IL]/g, "1").replace(/U/g, "V");
+}
+const CROCK = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+function syncNewCode(){
+  const bytes = new Uint8Array(10);
+  if(crypto && crypto.getRandomValues) crypto.getRandomValues(bytes);
+  else for(let i = 0; i < 10; i++) bytes[i] = Math.floor(Math.random() * 256);
+  return [...bytes].map(b => CROCK[b & 31]).join("");
+}
+
+function agoText(ts){
+  if(!ts) return t("syncNever");
+  const sec = Math.max(0, Math.round((Date.now() - ts) / 1000));
+  if(sec < 60) return t("syncAgo") + t("syncNowAgo");
+  const min = Math.round(sec / 60);
+  if(min < 60) return t("syncAgo") + min + " min";
+  const h = Math.round(min / 60);
+  if(h < 24) return t("syncAgo") + h + " h";
+  return t("syncAgo") + Math.round(h / 24) + " d";
+}
+function paintSyncStat(){
+  const el = document.getElementById("syncStat");
+  if(el){
+    let txt, cls = "";
+    if(!sync.code){ txt = t("syncNoCode") || ""; }
+    else if(syncBusy){ txt = t("syncBusy"); }
+    else if(sync.err === "offline"){ txt = t("syncOffline"); cls = "bad"; }
+    else if(sync.err === "noservice"){ txt = t("syncNoService"); cls = "bad"; }
+    else if(sync.err){ txt = t("syncErr") + " " + sync.err; cls = "bad"; }
+    else { txt = agoText(sync.last); cls = "ok"; }
+    el.innerHTML = `<span class="${cls}">${txt}</span>`;
+  }
+  paintSyncTick();
+}
+function paintSyncTick(){
+  const el = document.getElementById("syncTick");
+  if(!el) return;
+  el.textContent = !sync.code ? "" : sync.err ? "!" : sync.last ? "✓" : "·";
+  el.style.color = sync.err ? "var(--red)" : "var(--green)";
+}
+
+function paintSync(){
+  document.getElementById("syncTitle").textContent = t("syncTitle");
+  document.getElementById("syncSub").textContent = t("syncSub");
+  document.getElementById("syncClose").textContent = t("close");
+  document.getElementById("syncNew").textContent = sync.code ? t("syncOther") : t("syncNew");
+  const body = document.getElementById("syncBody");
+
+  if(sync.code){
+    body.innerHTML = `<div class="synccode" id="syncCodeBox">${syncCodeFmt(sync.code)}</div>
+      <div class="syncrow">
+        <button id="syncCopy">${t("syncCopy")}</button>
+        <button id="syncNow">${t("syncNow")}</button>
+        <button id="syncForget">${t("syncForget")}</button>
+      </div>
+      <p class="syncstat" id="syncStat"></p>
+      <p class="synchelp">${t("syncHave")}</p>
+      <p class="synchelp">${t("syncWhat")}</p>`;
+    document.getElementById("syncCopy").onclick = () => {
+      const txt = syncCodeFmt(sync.code);
+      const done = () => { const b = document.getElementById("syncCopy"); if(b){ b.textContent = t("syncCopied"); setTimeout(() => b.textContent = t("syncCopy"), 1400); } };
+      if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, done);
+      else {
+        const ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta);
+        ta.select(); try{ document.execCommand("copy"); }catch(e){} ta.remove(); done();
+      }
+    };
+    document.getElementById("syncNow").onclick = () => syncOnce(true);
+    document.getElementById("syncForget").onclick = () => {
+      if(confirm(t("syncForgetQ"))){ sync = {}; saveSync(); paintSync(); paintSyncTick(); }
+    };
+  } else {
+    body.innerHTML = `<div class="syncrow">
+        <input id="syncIn" placeholder="XXXXX-XXXXX" maxlength="11" autocapitalize="characters" spellcheck="false" inputmode="latin">
+        <button class="primary" id="syncJoin">${t("syncSave")}</button>
+      </div>
+      <p class="syncstat" id="syncStat"></p>
+      <p class="synchelp">${t("syncJoin")}</p>`;
+    document.getElementById("syncJoin").onclick = () => {
+      const code = syncCodeNorm(document.getElementById("syncIn").value);
+      if(code.length !== 10){ const st = document.getElementById("syncStat"); st.innerHTML = `<span class="bad">${t("syncBadCode")}</span>`; return; }
+      sync = { code, rev:0, last:0 }; saveSync();
+      paintSync(); paintSyncTick(); syncOnce(true);
+    };
+    document.getElementById("syncIn").onkeydown = e => { if(e.key === "Enter") document.getElementById("syncJoin").click(); };
+  }
+  paintSyncStat();
+}
+
+function openSync(){
+  document.getElementById("menuPanel").hidden = true;
+  document.getElementById("menuBtn").setAttribute("aria-expanded", "false");
+  document.getElementById("syncdlg").hidden = false;
+  paintSync();
+}
+function closeSync(){ document.getElementById("syncdlg").hidden = true; }
+
+document.getElementById("syncBtn").onclick = openSync;
+document.getElementById("syncClose").onclick = closeSync;
+document.getElementById("syncdlg").addEventListener("click", e => { if(e.target.id === "syncdlg") closeSync(); });
+document.getElementById("syncNew").onclick = () => {
+  if(sync.code && !confirm(t("syncForgetQ"))) return;
+  sync = { code:syncNewCode(), rev:0, last:0 };
+  saveSync(); paintSync(); paintSyncTick(); syncOnce(true);
+};
+
+/* al arrancar: si hay código, trae y mergea sin molestar */
+function syncBoot(){
+  paintSyncTick();
+  if(!sync.code) return;
+  syncOnce(false);
+}
+
 /* ---------- boot ---------- */
 function render(){
   paintMenu(); paintFilters(); wireFilters();
@@ -1268,6 +1636,7 @@ function render(){
 applyTheme();
 if(!deck) dealDeck();
 render();
+syncBoot();
 /* no auto-open: the help modal only appears when the user clicks ? or Help — it keeps the
    "guided tour" button inside for anyone who wants the step-by-step walkthrough. */
 </script>
