@@ -1,7 +1,7 @@
 # CCAR-F Flashcards
 
-Study material for the **Claude Certified Architect – Foundations (CCAR-F)** exam: 79 scenario-based
-multiple-choice cards over Domain 1 (*Agentic Architecture & Orchestration*), bilingual EN/ES.
+Study material for the **Claude Certified Architect – Foundations (CCAR-F)** exam: 347 scenario-based
+cards covering all five domains and all 30 sub-domains, single- and multiple-response, bilingual EN/ES.
 
 **Unofficial.** Not affiliated with, endorsed by, or produced by Anthropic. Built from the public exam
 guide and the publicly available lesson pages, with every citation an exact quote from those sources.
@@ -12,7 +12,7 @@ guide and the publicly available lesson pages, with every citation an exact quot
 |---|---|
 | `index.html` | landing page (English by default, ES/EN toggle) |
 | `ccarflashcards.html` | the study app — one self-contained file, no server, no CDN, works from `file://` |
-| `ccarflashcards.apkg` | the same 79 cards as an Anki deck (model v2, 19 fields, 5 sub-decks) |
+| `ccarflashcards.apkg` | the same 347 cards as an Anki deck (model v2, 21 fields, 5 sub-decks) |
 | `.nojekyll` | tells GitHub Pages to serve the files as-is |
 
 ## Two ways to study
@@ -23,8 +23,10 @@ citations.
 
 Every session is a **60-card deck** built from the filters you pick — nothing selected means everything:
 
-- *Domain & subdomain* — one, several, or all.
-- *Topics* — the trap taxonomy; disabled while *All traps* is checked.
+- *Topic* — the exam sub-domain (1.1 … 5.6); nothing selected means all 30.
+- *Traps* — the failure the question is built to provoke; nothing selected means all eight, one or
+  several selected means only those.
+- *Scenarios* — the six scenario families the real exam draws from.
 - *Shuffle* — on deals a random 60, off deals them in card-id order.
 - *New deck* — re-deals at any time; card-level progress is kept.
 
@@ -43,16 +45,16 @@ The two artifacts share content but not progress. Pick one.
 
 ## Deck contents
 
-- 79 cards, all Domain 1, seven sub-domains: 1.1 agentic loops (14), 1.2 orchestration patterns (10),
-  1.3 subagent invocation & context (12), 1.4 workflow enforcement & handoff (10), 1.5 Agent SDK hooks
-  (14), 1.6 task decomposition (9), 1.7 session state & resumption (10).
-- 124 citations, all verbatim substrings of the source corpus.
+- 347 cards, all 30 sub-domains: D1 agentic architecture 79, D2 tool design & MCP 58, D3 Claude Code
+  configuration 71, D4 prompt engineering & structured output 71, D5 context management 68.
+- 301 single-response (A–D) + 46 multiple-response (5 options, pick 2–3).
+- 652 citations, all verbatim substrings of the source corpus.
+- 50 of the cards are the real questions from the practice bank, question/options/answer untouched and
+  enriched with the explanation, trap and citations; the other 297 are generated in the same format.
 - Every card exists in English and Spanish; the app and the deck each have their own language switch
   (the deck's default is configurable at build time: `--lang en|es|both`).
 - Tags: `domain::D1`, `sub::1.5`, `trap::determinism_drift`, `difficulty::hard`, `origin::generated`.
-- Difficulty split: 43 core / 36 hard.
-
-Domains 2–5 (73% of the exam) are **not** covered yet.
+- Difficulty split: 184 core / 163 hard.
 
 ## Exam facts
 
