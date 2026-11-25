@@ -1166,7 +1166,8 @@ function render(){
 applyTheme();
 if(!deck) dealDeck();
 render();
-try{ if(localStorage.getItem(TOURKEY) !== "done") openTour(); }catch(e){}
+/* no auto-open: the help modal only appears when the user clicks ? or Help — it keeps the
+   "guided tour" button inside for anyone who wants the step-by-step walkthrough. */
 </script>
 </body>
 </html>
