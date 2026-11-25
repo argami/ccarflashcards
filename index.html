@@ -1,15 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>CCAR-F Flashcards — Claude Certified Architect, Foundations</title>
 <meta name="description" content="79 tarjetas de práctica bilingües para el examen CCAR-F (Claude Certified Architect – Foundations). En el navegador o para Anki.">
 <style>
   :root{
     --ink:#14171c; --ink-soft:#4a5260; --faint:#8b93a1;
     --paper:#f6f4ef; --card:#fffefb; --line:#e2ddd2;
-    --navy:#1a2b47; --red:#c02f2a; --green:#1f7a52; --amber:#a86a12;
+    --navy:#1a2b47; --head:#1a2b47; --red:#c02f2a; --green:#1f7a52; --amber:#a86a12;
+    --track:#e8e3d8; --note-bg:#fdf6e8; --note-fg:#6b4d12; --code-bg:#efeae0;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --ink:#e7e4dd; --ink-soft:#b3b8c1; --faint:#8d949e;
+    --paper:#121418; --card:#191c21; --line:#2b3038;
+    --head:#dfe7f5; --red:#e8736a; --green:#6fce92; --amber:#e0ad5e;
+    --track:#262b33; --note-bg:#241f14; --note-fg:#e6c48a; --code-bg:#232830;
     --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
   }
@@ -25,24 +35,29 @@
   .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;
        padding:20px 0;border-bottom:1px solid var(--line)}
   .brand{display:flex;align-items:baseline;gap:10px;font-family:var(--mono);
-         font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);font-weight:600}
+         font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--head);font-weight:600}
   .brand span{color:var(--faint);font-weight:400}
   .lang{display:flex;border:1px solid var(--line);border-radius:99px;overflow:hidden;background:var(--card)}
   .lang button{font:inherit;font-family:var(--mono);font-size:12px;letter-spacing:.06em;
     background:none;border:0;padding:6px 12px;color:var(--faint);cursor:pointer}
-  .lang button[aria-pressed="true"]{background:var(--navy);color:#fff}
+  .lang button[aria-pressed="true"]{background:var(--head);color:var(--paper)}
+  .nav-right{display:flex;align-items:center;gap:10px}
+  .themebtn{font:inherit;font-size:13px;line-height:1;width:32px;height:32px;border-radius:50%;
+    border:1px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer;transition:.15s}
+  .themebtn:hover{border-color:var(--head);color:var(--ink)}
+  .themebtn:focus-visible{outline:2px solid var(--red);outline-offset:2px}
 
   /* hero */
   .hero{padding:64px 0 40px;border-bottom:1px solid var(--line)}
   .kicker{font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
           color:var(--red);margin:0 0 18px}
   h1{font-family:var(--mono);font-weight:600;font-size:clamp(29px,4.4vw,46px);line-height:1.1;
-     letter-spacing:-.02em;margin:0 0 20px;max-width:26ch;color:var(--navy);text-wrap:balance}
+     letter-spacing:-.02em;margin:0 0 20px;max-width:26ch;color:var(--head);text-wrap:balance}
   h1 em{font-style:normal;color:var(--red)}
   .lede{font-size:clamp(16.5px,2vw,19.5px);color:var(--ink-soft);max-width:56ch;margin:0 0 28px}
   .facts{display:flex;flex-wrap:wrap;gap:26px 34px;margin:0 0 34px;font-family:var(--mono);font-size:13px}
   .facts div{display:flex;flex-direction:column;gap:2px}
-  .facts b{font-size:20px;font-weight:600;color:var(--navy);letter-spacing:-.01em}
+  .facts b{font-size:20px;font-weight:600;color:var(--head);letter-spacing:-.01em}
   .facts i{font-style:normal;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;font-size:10.5px}
 
   .cta{display:flex;flex-wrap:wrap;gap:12px}
@@ -50,10 +65,10 @@
        text-decoration:none;font-weight:600;font-size:15.5px;border:1px solid transparent;
        transition:transform .12s ease,background .15s ease,box-shadow .15s ease}
   .btn:active{transform:translateY(1px)}
-  .btn-primary{background:var(--navy);color:#fff;box-shadow:0 2px 0 rgba(26,43,71,.18)}
-  .btn-primary:hover{background:#24406b}
-  .btn-ghost{background:var(--card);color:var(--navy);border-color:var(--line)}
-  .btn-ghost:hover{border-color:var(--navy)}
+  .btn-primary{background:var(--head);color:var(--paper);box-shadow:0 2px 0 rgba(26,43,71,.18)}
+  .btn-primary:hover{opacity:.9}
+  .btn-ghost{background:var(--card);color:var(--head);border-color:var(--line)}
+  .btn-ghost:hover{border-color:var(--head)}
   .btn small{font-family:var(--mono);font-weight:400;opacity:.7;font-size:11.5px;letter-spacing:.04em}
 
   /* two options */
@@ -62,7 +77,7 @@
        display:flex;flex-direction:column;gap:10px}
   .opt h3{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
           color:var(--faint);margin:0}
-  .opt h2{margin:0;font-size:21px;letter-spacing:-.01em;color:var(--navy)}
+  .opt h2{margin:0;font-size:21px;letter-spacing:-.01em;color:var(--head)}
   .opt p{margin:0;color:var(--ink-soft);font-size:15.5px}
   .opt .btn{margin-top:auto;align-self:flex-start}
   .opt ul{margin-bottom:14px}
@@ -72,19 +87,19 @@
   /* stats */
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding:38px 0;border-bottom:1px solid var(--line)}
   .stat b{display:block;font-family:var(--mono);font-size:clamp(26px,3.6vw,38px);line-height:1;
-          color:var(--navy);letter-spacing:-.02em}
+          color:var(--head);letter-spacing:-.02em}
   .stat span{display:block;margin-top:8px;font-size:13.5px;color:var(--ink-soft)}
 
   /* inside a card */
   section.block{padding:52px 0;border-bottom:1px solid var(--line)}
   .h2{font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
       color:var(--red);margin:0 0 8px}
-  .h3{font-size:clamp(22px,3vw,29px);letter-spacing:-.015em;margin:0 0 14px;color:var(--navy);font-weight:600}
+  .h3{font-size:clamp(22px,3vw,29px);letter-spacing:-.015em;margin:0 0 14px;color:var(--head);font-weight:600}
   .sub{color:var(--ink-soft);max-width:62ch;margin:0 0 30px}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   .feat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
   .feat .n{font-family:var(--mono);font-size:11.5px;color:var(--faint);letter-spacing:.1em}
-  .feat h4{margin:8px 0 6px;font-size:15.5px;color:var(--navy)}
+  .feat h4{margin:8px 0 6px;font-size:15.5px;color:var(--head)}
   .feat p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.55}
 
   /* coverage */
@@ -92,23 +107,23 @@
   .bar{display:grid;grid-template-columns:270px 1fr 30px;align-items:center;gap:16px;
        font-family:var(--mono);font-size:12px}
   .bar .lab{color:var(--ink-soft)}
-  .bar .lab b{color:var(--navy);font-weight:600}
-  .bar .track{display:block;height:10px;background:#e8e3d8;border-radius:99px;overflow:hidden}
-  .bar .fill{display:block;height:100%;background:var(--navy);border-radius:99px}
+  .bar .lab b{color:var(--head);font-weight:600}
+  .bar .track{display:block;height:10px;background:var(--track);border-radius:99px;overflow:hidden}
+  .bar .fill{display:block;height:100%;background:var(--head);border-radius:99px}
   .bar .n{text-align:right;color:var(--faint)}
-  .note{margin-top:22px;padding:14px 16px;border-left:3px solid var(--amber);background:#fdf6e8;
-        border-radius:0 8px 8px 0;font-size:14.5px;color:#6b4d12}
+  .note{margin-top:22px;padding:14px 16px;border-left:3px solid var(--amber);background:var(--note-bg);
+        border-radius:0 8px 8px 0;font-size:14.5px;color:var(--note-fg)}
 
   /* how to */
   .howto{display:grid;grid-template-columns:1fr 1fr;gap:32px}
-  .howto h3{margin:0 0 4px;font-size:17px;color:var(--navy)}
+  .howto h3{margin:0 0 4px;font-size:17px;color:var(--head)}
   .howto ol{margin:12px 0 0;padding-left:20px;color:var(--ink-soft);font-size:15px}
   .howto ol li{margin:7px 0}
-  .howto code{font-family:var(--mono);font-size:12.5px;background:#efeae0;padding:2px 6px;border-radius:4px}
+  .howto code{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);padding:2px 6px;border-radius:4px}
 
   /* faq */
   details{border-bottom:1px solid var(--line);padding:15px 0}
-  details summary{cursor:pointer;font-weight:600;color:var(--navy);font-size:16px;list-style:none}
+  details summary{cursor:pointer;font-weight:600;color:var(--head);font-size:16px;list-style:none}
   details summary::-webkit-details-marker{display:none}
   details summary::before{content:"+ ";font-family:var(--mono);color:var(--red)}
   details[open] summary::before{content:"– ";font-family:var(--mono);color:var(--red)}
@@ -134,9 +149,12 @@
 <div class="wrap">
   <nav class="nav">
     <div class="brand">CCAR-F <span>/ flashcard deck</span></div>
+    <div class="nav-right">
+    <button class="themebtn" id="themeBtn" aria-label="Light / dark"><span id="themeIcon">◐</span></button>
     <div class="lang" role="group" aria-label="Language">
       <button data-set="es" aria-pressed="false">ES</button>
       <button data-set="en" aria-pressed="true">EN</button>
+    </div>
     </div>
   </nav>
 
@@ -322,6 +340,20 @@
   document.querySelectorAll('.lang button').forEach(function(b){
     b.addEventListener('click', function(){ set(b.dataset.set); });
   });
+  // tema claro/oscuro, compartido con la app de estudio
+  var TKEY = 'ccarf_theme_v1';
+  function applyTheme(th){
+    document.documentElement.dataset.theme = th;
+    document.getElementById('themeIcon').textContent = th === 'dark' ? '☀' : '☾';
+    try { localStorage.setItem(TKEY, th); } catch(e){}
+  }
+  var savedTheme = 'light';
+  try { savedTheme = localStorage.getItem(TKEY) || 'light'; } catch(e){}
+  applyTheme(savedTheme);
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+  });
+
   var saved = 'en';   // idioma por defecto de la página
   try { saved = localStorage.getItem('ccarf_landing_lang') || 'en'; } catch(e){}
   set(saved);

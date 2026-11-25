@@ -19,8 +19,19 @@ guide and the publicly available lesson pages, with every citation an exact quot
 
 **In the browser.** Open `ccarflashcards.html`. Answer with keys `1`–`4`, `Space` for the next card.
 Each card gives correctness feedback, why every distractor fails, the trap it's testing, and the source
-citations. Progress is stored in your browser's `localStorage` — it does not sync between devices, and
-clearing site data resets it. Study queue is a Leitner ladder (0-1-3-7-16 days).
+citations.
+
+Every session is a **60-card deck** built from the filters you pick — nothing selected means everything:
+
+- *Domain & subdomain* — one, several, or all.
+- *Topics* — the trap taxonomy; disabled while *All traps* is checked.
+- *Shuffle* — on deals a random 60, off deals them in card-id order.
+- *New deck* — re-deals at any time; card-level progress is kept.
+
+The ☰ menu holds the three views (Study / Progress / All), the ES / EN / ES+EN language switch and the
+light / dark theme. All three choices — language, theme, filters, deck position — persist in
+`localStorage` for that browser. It does not sync between devices and clearing site data resets it.
+Per-card scheduling is a Leitner ladder (0-1-3-7-16 days).
 
 **In Anki.** Import `ccarflashcards.apkg` (Anki desktop, AnkiDroid, AnkiMobile, AnkiWeb — all free).
 You get real spaced repetition scheduling and sync across devices, at the cost of needing an app.
