@@ -567,7 +567,7 @@ function paintMenu(){
   });
   document.getElementById("kicker").textContent = t("kicker");
   document.querySelectorAll("[data-lbl]").forEach(el => { el.textContent = t(el.dataset.lbl); });
-  document.getElementById("footKeys").innerHTML = `<kbd>1</kbd>–<kbd>4</kbd> ${t("keys")}`;
+  document.getElementById("footKeys").innerHTML = `<kbd>1</kbd>–<kbd>5</kbd> ${t("keys")}`;
   document.getElementById("helpLabel").textContent = t("help");
   const tb = document.getElementById("themeBtn");
   tb.textContent = theme === "dark" ? "☀" : "☾";
@@ -897,7 +897,7 @@ const TOUR = {
   es:{title:"Cómo se usa en treinta segundos", sub:"Guía rápida",
       steps:[
         "Cada sesión es un <b>mazo de 60 cartas</b> sacadas de los filtros de arriba. Si no marcas nada, entran todas.",
-        "Elige una opción con las teclas <kbd>1</kbd>–<kbd>4</kbd> o con el ratón. Verás la respuesta correcta, por qué falla cada distractor y la cita del material oficial.",
+        "Elige con las teclas <kbd>1</kbd>–<kbd>4</kbd> (o <kbd>1</kbd>–<kbd>5</kbd> en las de respuesta múltiple) o con el ratón. Verás la respuesta correcta, por qué falla cada distractor y la cita del material oficial.",
         "Los controles están <b>arriba de la carta</b>: atrás, repetir, marcar con estrella y siguiente. <kbd>espacio</kbd> también pasa de carta sin bajar a leer la explicación.",
         "<b>Tema</b> y <b>Trampas</b> recortan el mazo: el tema es el subdominio del examen, la trampa es el fallo que la pregunta provoca. Sin marcar nada entran todas; marca una o varias y solo entran esas.",
         "Con <b>Barajar</b> el mazo sale desordenado; sin marcar, en orden de ficha. <b>Nuevo mazo</b> reparte otros 60 sin borrar tu progreso.",
@@ -906,7 +906,7 @@ const TOUR = {
   en:{title:"How this works, in thirty seconds", sub:"Quick tour",
       steps:[
         "Every session is a <b>60-card deck</b> dealt from the filters above. Select nothing and everything is included.",
-        "Pick an option with <kbd>1</kbd>–<kbd>4</kbd> or the mouse. You get the correct answer, why every distractor fails, and a verbatim quote from the official material.",
+        "Pick with <kbd>1</kbd>–<kbd>4</kbd> (or <kbd>1</kbd>–<kbd>5</kbd> on multiple-response cards) or the mouse. You get the correct answer, why every distractor fails, and a verbatim quote from the official material.",
         "The controls sit <b>above the card</b>: back, repeat, star and next. <kbd>space</kbd> also moves on without scrolling through the explanation.",
         "<b>Topic</b> and <b>Traps</b> narrow the deck: the topic is the exam subdomain, the trap is the failure the question provokes. Select nothing and every trap is in; select one or more and only those are dealt.",
         "<b>Shuffle</b> deals in random order; unchecked, in card order. <b>New deck</b> deals another 60 without touching your progress.",
@@ -948,7 +948,7 @@ const GUIDE = {
   es:[
     {sel:"#filters", text:"Aquí decides qué entra en el mazo: <b>tema</b> (subdominio), <b>trampas</b> (el fallo que provoca la pregunta), <b>barajar</b> y <b>nuevo mazo</b>. Si no marcas nada, entran todas."},
     {sel:"#app .scenario", text:"Cada carta abre con un <b>escenario real de trabajo</b>. Lee rápido el contexto: la pregunta sale de ahí."},
-    {sel:"#app .question", text:"La pregunta, con cuatro opciones. Responde con <kbd>1</kbd>–<kbd>4</kbd> o haciendo clic."},
+    {sel:"#app .question", text:"La pregunta, con cuatro opciones (cinco y varias correctas en las de respuesta múltiple). Responde con <kbd>1</kbd>–<kbd>5</kbd> o haciendo clic."},
     {sel:"#app .acts", text:"<b>Arriba y siempre a mano</b>: atrás, repetir, marcar con estrella y siguiente. No hace falta bajar a leer toda la explicación para pasar de carta."},
     {sel:null, text:"Al responder se despliegan la respuesta real, por qué falla cada distractor y la cita literal del material oficial. Vuelve a ellas cuando falles, o usa <b>Fallidas</b> para repasarlas en bloque."},
     {sel:"#menuBtn", text:"En ☰ tienes <b>Progreso</b>, <b>Todas</b>, <b>Fallidas</b>, idioma y tema claro/oscuro. El <b>?</b> de al lado reabre esta ayuda siempre que quieras."}
@@ -956,7 +956,7 @@ const GUIDE = {
   en:[
     {sel:"#filters", text:"This is what goes into the deck: <b>topic</b> (subdomain), <b>traps</b> (the failure the question provokes), <b>shuffle</b> and <b>new deck</b>. Select nothing and every card is in."},
     {sel:"#app .scenario", text:"Every card opens with a <b>real work scenario</b>. Read the context quickly — the question comes out of it."},
-    {sel:"#app .question", text:"The question, with four options. Answer with <kbd>1</kbd>–<kbd>4</kbd> or a click."},
+    {sel:"#app .question", text:"The question, with four options (five, several correct, on multiple-response cards). Answer with <kbd>1</kbd>–<kbd>5</kbd> or a click."},
     {sel:"#app .acts", text:"<b>Up here, always in reach</b>: back, repeat, star and next. You do not have to scroll through the whole explanation to move on."},
     {sel:null, text:"Answering opens the correct answer, why every distractor fails and a verbatim quote from the official material. Come back to it when you miss, or use <b>Failed</b> to review them in bulk."},
     {sel:"#menuBtn", text:"The ☰ menu holds <b>Progress</b>, <b>All</b>, <b>Failed</b>, language and light/dark theme. The <b>?</b> next to it reopens this help whenever you want."}
