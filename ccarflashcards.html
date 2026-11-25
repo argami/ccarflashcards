@@ -414,6 +414,16 @@ function loadDeck(){
     const d = JSON.parse(localStorage.getItem(DKEY));
     if(d && Array.isArray(d.ids) && d.f && Array.isArray(d.f.subs) && Array.isArray(d.f.traps)){
       if(!Array.isArray(d.f.scens)) d.f.scens = [];
+      // A deck saved by an older build can hold card ids this build no longer has.
+      // Drop them, or the queue points at nothing and the screen renders blank.
+      const known = new Set(DATA.cards.map(c => c.id));
+      const ids = d.ids.filter(id => known.has(id));
+      if(ids.length !== d.ids.length){
+        d.ids = ids;
+        d.idx = Math.min(d.idx || 0, Math.max(0, ids.length - 1));
+        if(!ids.length){ localStorage.removeItem(DKEY); return null; }   // nothing left: deal fresh
+        localStorage.setItem(DKEY, JSON.stringify(d));                    // heal the stored deck
+      }
       return d;
     }
   }catch(e){}
