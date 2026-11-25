@@ -120,11 +120,6 @@
   .quote{display:block;font-style:italic;margin-top:3px;color:var(--fg);opacity:.8}
   .langtag{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
     margin:16px 0 6px;border-top:1px dashed var(--line);padding-top:10px}
-  .grade{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
-  .grade button{flex:1;min-width:105px;padding:11px 8px;font-size:13px}
-  .grade button small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
-  .grade button:hover{background:var(--accent);color:#fff}
-  .grade button:hover small{color:rgba(255,255,255,.78)}
 
   /* done + stats + browse */
   .done{margin:36px 0;text-align:center}
@@ -144,6 +139,31 @@
   kbd{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:0 4px;font-size:10.5px}
   .sect{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
     margin:26px 0 8px;font-weight:600}
+  .hdr-r{display:flex;align-items:center;gap:8px}
+  #helpBtn{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;font-size:12.5px}
+  #helpBtn .q{font-weight:700;color:var(--accent)}
+
+  /* study action bar: stays above the card, never below the answer */
+  .acts{position:sticky;top:0;z-index:24;display:flex;gap:6px;align-items:center;
+    background:var(--bg);padding:8px 0 9px;margin:-2px 0 12px;border-bottom:1px solid var(--line)}
+  .acts .spacer{flex:1}
+  .acts button{padding:8px 12px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px}
+  .acts #aNext{min-width:96px;justify-content:center}
+  .acts .star{font-size:15px;line-height:1;padding:7px 11px}
+  .acts .star.on{color:var(--amber);border-color:var(--amber);background:var(--amber-bg)}
+
+  /* guided tour */
+  .spot{position:fixed;z-index:70;border:2px solid var(--accent);border-radius:10px;
+    box-shadow:0 0 0 9999px rgba(10,12,16,.55);pointer-events:none;transition:all .16s ease}
+  .spot[hidden]{display:none}
+  .coach{position:fixed;z-index:71;width:min(340px,calc(100vw - 28px));background:var(--bg);
+    border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:15px 16px}
+  .coach[hidden]{display:none}
+  .coach .n{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .coach p{margin:0;font-size:13.5px;line-height:1.5}
+  .coach .nav{display:flex;gap:6px;justify-content:flex-end;margin-top:12px}
+  .coach .nav button{font-size:12px;padding:6px 10px}
+
   /* quick tour */
   .overlay{position:fixed;inset:0;z-index:60;background:rgba(12,14,18,.5);display:flex;
     align-items:center;justify-content:center;padding:18px}
@@ -163,6 +183,12 @@
   footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--line);
     font-size:11px;color:var(--muted);padding:7px 18px;display:flex;justify-content:space-between;gap:12px}
   @media(max-width:640px){
+    h1{font-size:12.5px;letter-spacing:.09em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .kicker{font-size:9px;letter-spacing:.05em;line-height:1.35}
+    #helpBtn,#menuBtn{padding:6px 9px;font-size:11.5px}
+    .acts button{padding:7px 9px;font-size:11.5px}
+    .acts #aNext{min-width:78px}
+    .coach{padding:13px 14px}
     .filters{gap:6px}
     .dd-btn,.fcheck{font-size:12px}
     .dd-panel{min-width:min(300px,86vw)}
@@ -179,7 +205,9 @@
       <h1>CCAR-F · Flashcards</h1>
       <div class="kicker" id="kicker"></div>
     </div>
-    <div class="user">
+    <div class="hdr-r">
+      <button id="helpBtn" aria-haspopup="dialog" title="Help"><span class="q">?</span><span id="helpLabel"></span></button>
+      <div class="user">
       <button id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="menuPanel">
         <span class="dots">☰</span><span id="menuLabel"></span><span class="caret">▾</span>
       </button>
@@ -189,6 +217,7 @@
           <button class="menu-item" data-tab="study" role="menuitem"><span data-nav="study"></span><span class="tick" data-tick="study">✓</span></button>
           <button class="menu-item" data-tab="stats" role="menuitem"><span data-nav="stats"></span><span class="tick" data-tick="stats">✓</span></button>
           <button class="menu-item" data-tab="browse" role="menuitem"><span data-nav="browse"></span><span class="tick" data-tick="browse">✓</span></button>
+          <button class="menu-item" data-tab="failed" role="menuitem"><span data-nav="failed"></span><span class="tick" data-tick="failed">✓</span></button>
         </div>
         <div class="menu-sec">
           <div class="menu-lbl" id="mLblLang"></div>
@@ -197,7 +226,7 @@
           </div>
         </div>
         <div class="menu-sec">
-          <button class="menu-item" id="tourBtn" role="menuitem"><span data-lbl="tour"></span><span class="tick">?</span></button>
+          <button class="menu-item" id="tourBtn" role="menuitem"><span data-lbl="help"></span><span class="tick">?</span></button>
         </div>
         <div class="menu-sec">
           <div class="menu-lbl" id="mLblTheme"></div>
@@ -205,6 +234,7 @@
             <button data-theme="light"></button><button data-theme="dark"></button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </header>
@@ -235,9 +265,14 @@
     <h2 id="tourTitle"></h2>
     <p class="sub" id="tourSub"></p>
     <ol id="tourSteps"></ol>
-    <div class="tour-foot"><button class="primary" id="tourClose"></button></div>
+    <div class="tour-foot">
+      <button id="guideStart"></button>
+      <button class="primary" id="tourClose"></button>
+    </div>
   </div>
 </div>
+<div class="spot" id="spot" hidden></div>
+<div class="coach" id="coach" hidden role="dialog" aria-live="polite"></div>
 <footer>
   <span id="footKeys"></span>
   <span id="foot"></span>
@@ -263,14 +298,18 @@ const T = {
       best:"mejor",inFilter:"cartas en el filtro",deckOf:"de",
       correct:"✅ Correcto",incorrect:(k)=>`❌ Incorrecto — la respuesta era ${k}`,
       you:"Tu respuesta",real:"Respuesta real",others:"Por qué fallan las demás",trap:"Trampa",
-      again:"Otra vez",hard:"Difícil",good:"Bien",easy:"Fácil",today:"hoy",
+      back:"Atrás",repeat:"Repetir",next:"Siguiente",star:"Marcar",starred:"Marcada",
+      failed:"Fallidas",help:"Ayuda",close:"Cerrar",guide:"Guía paso a paso",skip:"Saltar",done:"Listo",
+      failedTitle:"Cartas falladas",failedHint:"Todo lo que has fallado al menos una vez, de más a menos fallos.",
+      noFailed:"Todavía no has fallado ninguna. Cuando falles, aparecerán aquí.",
+      dealFailed:"Estudiar estas cartas",failN:"fallos",okN:"aciertos",
       acc:"Precisión",answers:"respuestas",score:"Score estimado",above:"por encima del 720",
       below:"por debajo del 720",cardsSeen:"Cartas vistas",bySub:"Por subdominio",
       weak:"Trampas más débiles",noData:"Sin datos aún.",reset:"Reiniciar progreso",
       confirmReset:"¿Borrar todo el progreso?",total:"cartas totales",cardsN:"cartas",
       deckDone:"Mazo completado",deckAcc:"Aciertos del mazo",newDeck:"Repartir otro mazo de 60",
       all:"Todos",clear:"Quitar",keys:"responder · espacio siguiente",filterHint:"Sin selección = todo",
-      tour:"Cómo se usa",
+      keysFull:"responder · espacio siguiente · ← atrás",
       kicker:"Claude Certified Architect — Foundations · 720/1000 para aprobar"},
   en:{study:"Study",stats:"Progress",browse:"All",menu:"Menu",go:"Go to",language:"Language",
       theme:"Theme",light:"Light",dark:"Dark",
@@ -280,14 +319,18 @@ const T = {
       best:"best",inFilter:"cards in filter",deckOf:"of",
       correct:"✅ Correct",incorrect:(k)=>`❌ Incorrect — the answer was ${k}`,
       you:"Your answer",real:"Correct answer",others:"Why the others fail",trap:"Trap",
-      again:"Again",hard:"Hard",good:"Good",easy:"Easy",today:"today",
+      back:"Back",repeat:"Repeat",next:"Next",star:"Star",starred:"Starred",
+      failed:"Failed",help:"Help",close:"Close",guide:"Guided tour",skip:"Skip",done:"Done",
+      failedTitle:"Missed cards",failedHint:"Everything you have got wrong at least once, most-missed first.",
+      noFailed:"Nothing missed yet. Cards you get wrong will collect here.",
+      dealFailed:"Study these cards",failN:"wrong",okN:"right",
       acc:"Accuracy",answers:"answers",score:"Estimated score",above:"above the 720 pass mark",
       below:"below the 720 pass mark",cardsSeen:"Cards seen",bySub:"By subdomain",
       weak:"Weakest traps",noData:"No data yet.",reset:"Reset progress",
       confirmReset:"Delete all progress?",total:"cards in total",cardsN:"cards",
       deckDone:"Deck complete",deckAcc:"Cards correct in this deck",newDeck:"Deal another 60",
       all:"All",clear:"Clear",keys:"answer · space for next",filterHint:"Nothing selected = everything",
-      tour:"Quick tour",
+      keysFull:"answer · space for next · ← back",
       kicker:"Claude Certified Architect — Foundations · 720/1000 to pass"}
 };
 const t  = k => (lang === "en" ? T.en : T.es)[k];
@@ -306,8 +349,7 @@ function rec(id){
   state.cards[id] = state.cards[id] || {box:0, due:0, seen:0, ok:0, bad:0};
   return state.cards[id];
 }
-const DAY = 86400000;
-const INTERVAL = [0, 1, 3, 7, 16];
+
 
 const SUBS = [...new Set(DATA.cards.map(c => c.subdomain))].sort();
 const DOMAINS = [...new Set(DATA.cards.map(c => c.domain))].sort();
@@ -323,6 +365,14 @@ function loadDeck(){
   return null;
 }
 function saveDeck(){ localStorage.setItem(DKEY, JSON.stringify(deck)); }
+
+const SKEY = "ccarf_stars_v1";
+let stars = new Set();
+try{ stars = new Set(JSON.parse(localStorage.getItem(SKEY) || "[]")); }catch(e){}
+function toggleStar(id){
+  stars.has(id) ? stars.delete(id) : stars.add(id);
+  localStorage.setItem(SKEY, JSON.stringify([...stars]));
+}
 
 function filters(){
   if(!deck) deck = {ids:[], idx:0, answers:{}, f:{subs:[], traps:[], allTraps:true, shuffle:true}};
@@ -437,13 +487,11 @@ function wireFilters(){
 
 /* ---------- user menu ---------- */
 function paintMenu(){
-  document.getElementById("menuLabel").textContent =
-    t(view.tab === "study" ? "study" : view.tab === "stats" ? "stats" : "browse");
+  document.getElementById("menuLabel").textContent = t(view.tab);
   document.getElementById("mLblGo").textContent = t("go");
   document.getElementById("mLblLang").textContent = t("language");
   document.getElementById("mLblTheme").textContent = t("theme");
-  document.querySelectorAll("[data-nav]").forEach(el => el.textContent =
-    t(el.dataset.nav === "study" ? "study" : el.dataset.nav === "stats" ? "stats" : "browse"));
+  document.querySelectorAll("[data-nav]").forEach(el => el.textContent = t(el.dataset.nav));
   document.querySelectorAll("[data-tick]").forEach(el =>
     el.style.visibility = el.dataset.tick === view.tab ? "visible" : "hidden");
   document.querySelectorAll("#langseg button").forEach(b => b.className = b.dataset.lang === lang ? "on" : "");
@@ -454,6 +502,7 @@ function paintMenu(){
   document.getElementById("kicker").textContent = t("kicker");
   document.querySelectorAll("[data-lbl]").forEach(el => { el.textContent = t(el.dataset.lbl); });
   document.getElementById("footKeys").innerHTML = `<kbd>1</kbd>–<kbd>4</kbd> ${t("keys")}`;
+  document.getElementById("helpLabel").textContent = t("help");
 }
 function applyTheme(){
   document.documentElement.dataset.theme = theme;
@@ -475,6 +524,12 @@ document.addEventListener("click", e => {
   if(view.open && !e.target.closest(".dd")){ view.open = null; paintFilters(); }
 });
 document.addEventListener("keydown", e => {
+  if(guideOn){
+    if(e.key === "Escape"){ e.preventDefault(); endGuide(); }
+    else if(e.key === "Enter" || e.key === "ArrowRight" || e.key === " "){ e.preventDefault(); gi++; showStep(); }
+    else if(e.key === "ArrowLeft"){ e.preventDefault(); gi--; showStep(); }
+    return;
+  }
   if(e.key === "Escape"){
     if(!document.getElementById("tour").hidden){ closeTour(); return; }
     view.open = null; paintFilters();
@@ -485,7 +540,9 @@ document.addEventListener("keydown", e => {
   if(view.tab !== "study" || !document.getElementById("menuPanel").hidden) return;
   if(!document.getElementById("tour").hidden) return;
   if(["1","2","3","4"].includes(e.key) && !view.answered && curCard()){ answer(ROWS[+e.key-1]); }
-  else if((e.key === " " || e.key === "Enter") && view.answered){ e.preventDefault(); grade("good"); }
+  else if((e.key === " " || e.key === "Enter") && view.answered){ e.preventDefault(); goNext(); }
+  else if(e.key === "Backspace" || e.key === "ArrowLeft"){ e.preventDefault(); goBack(); }
+  else if(e.key === "ArrowRight" && view.answered){ e.preventDefault(); goNext(); }
 });
 document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => {
   view.tab = b.dataset.tab;
@@ -511,8 +568,17 @@ function renderStudy(el){
   }
   if(deck.idx >= deck.ids.length) return renderDone(el);
   const c = curCard(), r = rec(c.id), total = deck.ids.length;
+  if(!view.answered && deck.answers[c.id]){ view.answered = true; view.picked = deck.answers[c.id]; }
+  const starred = stars.has(c.id);
 
-  let html = `<div class="progress">
+  let html = `<div class="acts" id="acts">
+      <button id="aBack" ${deck.idx === 0 ? "disabled" : ""}>← ${t("back")}</button>
+      <button id="aRepeat">↺ ${t("repeat")}</button>
+      <span class="spacer"></span>
+      <button id="aStar" class="star ${starred ? "on" : ""}" aria-pressed="${starred}" title="${t("star")}">${starred ? "★" : "☆"}</button>
+      <button id="aNext" class="${view.answered ? "primary" : ""}">${t("next")} →</button>
+    </div>
+    <div class="progress">
       <span><b>${deck.idx+1}/${total}</b> ${t("inQueue")}</span>
       <span>${t("seen")} <b>${r.seen}</b> · ✅ <b>${r.ok}</b> · ❌ <b>${r.bad}</b></span>
       <span>${t("streak")} <b>${state.streak}</b> · ${t("best")} <b>${state.best}</b></span>
@@ -537,16 +603,13 @@ function renderStudy(el){
     const ok = view.picked === c.correct;
     html += `<div class="verdict ${ok?"ok":"ko"}">${ok ? t("correct") : t("incorrect")(c.correct)}</div>`;
     html += explain(c, ok) + CITE(c);
-    html += `<div class="grade">
-      <button data-g="again">${t("again")}<small>${t("today")}</small></button>
-      <button data-g="hard">${t("hard")}<small>${INTERVAL[1]}d</small></button>
-      <button data-g="good">${t("good")}<small>${INTERVAL[2]}d</small></button>
-      <button data-g="easy">${t("easy")}<small>${INTERVAL[3]}d</small></button>
-    </div>`;
   }
   el.innerHTML = html;
   if(!view.answered) el.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(b.dataset.k));
-  else el.querySelectorAll("[data-g]").forEach(b => b.onclick = () => grade(b.dataset.g));
+  document.getElementById("aBack").onclick = goBack;
+  document.getElementById("aRepeat").onclick = repeatCard;
+  document.getElementById("aNext").onclick = goNext;
+  document.getElementById("aStar").onclick = () => { toggleStar(c.id); render(); };
   document.getElementById("foot").textContent = `${total} ${t("deckOf")} ${pool().length} ${t("inFilter")}`;
 }
 
@@ -601,18 +664,22 @@ function answer(k){
   render();
 }
 
-function grade(g){
-  const c = curCard(); if(!c) return;
-  const r = rec(c.id);
-  if(g === "again") r.box = 0;
-  else if(g === "hard") r.box = Math.max(1, r.box);
-  else if(g === "good") r.box = Math.min(4, r.box + 1);
-  else if(g === "easy") r.box = Math.min(4, r.box + 2);
-  r.due = Date.now() + INTERVAL[r.box] * DAY;
-  save();
+function goNext(){
+  if(!deck || !deck.ids.length) return;
   deck.idx++; saveDeck();
   view.answered = false; view.picked = null;
-  render();
+  render(); window.scrollTo({top:0, behavior:"smooth"});
+}
+function goBack(){
+  if(!deck || !deck.ids.length || deck.idx === 0) return;
+  deck.idx--; saveDeck();
+  view.answered = false; view.picked = null;
+  render(); window.scrollTo({top:0, behavior:"smooth"});
+}
+function repeatCard(){
+  const c = curCard(); if(!c) return;
+  deck.ids.push(c.id);          // it comes back at the end of this deck
+  saveDeck(); goNext();
 }
 
 /* ---------- stats ---------- */
@@ -653,6 +720,44 @@ function renderStats(el){
   document.getElementById("foot").textContent = `${DATA.cards.length} ${t("total")}`;
 }
 
+/* ---------- failed ---------- */
+function openCard(id){
+  if(deck && deck.ids.includes(id)) deck.idx = deck.ids.indexOf(id);
+  else { deck.ids = [id]; deck.idx = 0; }
+  deck.answers = deck.answers || {}; saveDeck();
+  view.tab = "study"; view.answered = false; view.picked = null;
+  paintMenu(); render(); window.scrollTo({top:0});
+}
+function renderFailed(el){
+  const rows = DATA.cards
+    .map(c => ({c, r: state.cards[c.id] || {}}))
+    .filter(x => x.r.bad > 0)
+    .sort((a,b) => (b.r.bad - a.r.bad) || a.c.id.localeCompare(b.c.id));
+  if(!rows.length){
+    el.innerHTML = `<div class="empty">${t("noFailed")}</div>`;
+    document.getElementById("foot").textContent = `0 ${t("failed")}`;
+    return;
+  }
+  el.innerHTML = `<div class="sect">${t("failedTitle")} · ${rows.length}</div>
+    <div class="cite" style="margin:-2px 0 14px">${t("failedHint")}</div>
+    <div style="margin-bottom:16px"><button class="primary" id="dealFailed">${t("dealFailed")} (${Math.min(rows.length, DECK_SIZE)})</button></div>` +
+    rows.map(({c,r}) => `<div class="box red">
+        <b>${stars.has(c.id) ? "★ " : ""}${c.id} · ${c.subdomain} · ${c.trap.kind}</b>
+        <div style="font-weight:600;margin-bottom:6px">${h(c.question)}</div>
+        <div style="color:var(--green)">${c.correct}: ${h(c.options[c.correct])}</div>
+        <div class="cite" style="margin-top:7px">❌ ${r.bad||0} ${t("failN")} · ✅ ${r.ok||0} ${t("okN")} · ${t("seen")} ${r.seen||0}</div>
+        <div style="margin-top:9px"><button data-open="${c.id}">${t("study")}</button></div>
+      </div>`).join("");
+  document.getElementById("dealFailed").onclick = () => {
+    deck.ids = rows.slice(0, DECK_SIZE).map(x => x.c.id);
+    deck.idx = 0; deck.answers = {}; deck.created = Date.now(); saveDeck();
+    view.tab = "study"; view.answered = false; view.picked = null;
+    paintMenu(); render(); window.scrollTo({top:0});
+  };
+  el.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openCard(b.dataset.open));
+  document.getElementById("foot").textContent = `${rows.length} ${t("failed")}`;
+}
+
 /* ---------- browse ---------- */
 function renderBrowse(el){
   const p = pool();
@@ -662,7 +767,7 @@ function renderBrowse(el){
     return `<div class="sect">${s} · ${list.length} ${t("cardsN")}</div>` +
       list.map(c => {
         const r = state.cards[c.id] || {};
-        return `<div class="box"><b>${c.id} · ${c.trap.kind} · ${c.difficulty}</b>
+        return `<div class="box"><b>${stars.has(c.id) ? "★ " : ""}${c.id} · ${c.trap.kind} · ${c.difficulty}</b>
           <div style="font-weight:600;margin-bottom:6px">${h(c.question)}</div>
           <div style="color:var(--green)">${c.correct}: ${h(c.options[c.correct])}</div>
           <div style="margin-top:6px">${h(c["why_correct_" + (lang==="en"?"en":"es")] || c.why_correct_es)}</div>
@@ -678,19 +783,19 @@ const TOUR = {
       steps:[
         "Cada sesión es un <b>mazo de 60 cartas</b> sacadas de los filtros de arriba. Si no marcas nada, entran todas.",
         "Elige una opción con las teclas <kbd>1</kbd>–<kbd>4</kbd> o con el ratón. Verás la respuesta correcta, por qué falla cada distractor y la cita del material oficial.",
-        "Pulsa <kbd>espacio</kbd> para pasar de carta. Los botones Otra vez / Difícil / Bien / Fácil solo deciden cuándo vuelve a salir.",
+        "Los controles están <b>arriba de la carta</b>: atrás, repetir, marcar con estrella y siguiente. <kbd>espacio</kbd> también pasa de carta sin bajar a leer la explicación.",
         "<b>Dominio y subdominio</b> y <b>Temas</b> recortan el mazo. Con <b>Todas las trampas</b> marcada el filtro de temas se ignora.",
         "Con <b>Barajar</b> el mazo sale desordenado; sin marcar, en orden de ficha. <b>Nuevo mazo</b> reparte otros 60 sin borrar tu progreso.",
-        "En el menú ☰ están Progreso, Todas, el idioma y el tema claro/oscuro. Todo se guarda en este navegador."],
+        "En el menú ☰ están Progreso, Todas y <b>Fallidas</b> —el listado de todo lo que has fallado—, además del idioma y el tema. El botón <b>?</b> reabre esta ayuda cuando quieras."],
       cta:"Entendido"},
   en:{title:"How this works, in thirty seconds", sub:"Quick tour",
       steps:[
         "Every session is a <b>60-card deck</b> dealt from the filters above. Select nothing and everything is included.",
         "Pick an option with <kbd>1</kbd>–<kbd>4</kbd> or the mouse. You get the correct answer, why every distractor fails, and a verbatim quote from the official material.",
-        "Press <kbd>space</kbd> for the next card. Again / Hard / Good / Easy only decide when that card comes back.",
+        "The controls sit <b>above the card</b>: back, repeat, star and next. <kbd>space</kbd> also moves on without scrolling through the explanation.",
         "<b>Domain &amp; subdomain</b> and <b>Topics</b> narrow the deck. With <b>All traps</b> checked the topic filter is ignored.",
         "<b>Shuffle</b> deals in random order; unchecked, in card order. <b>New deck</b> deals another 60 without touching your progress.",
-        "The ☰ menu holds Progress, All cards, the language switch and the light/dark theme. Everything is saved in this browser."],
+        "The ☰ menu holds Progress, All cards and <b>Failed</b> — everything you have missed — plus language and theme. The <b>?</b> button reopens this help any time."],
       cta:"Got it"}
 };
 const TOURKEY = "ccarf_tour_v1";
@@ -699,22 +804,100 @@ function openTour(){
   document.getElementById("tourTitle").textContent = d.title;
   document.getElementById("tourSub").textContent = d.sub;
   document.getElementById("tourSteps").innerHTML = d.steps.map(s => `<li>${s}</li>`).join("");
-  document.getElementById("tourClose").textContent = d.cta;
-  const o = document.getElementById("tour");
-  o.hidden = false;
+  document.getElementById("tourClose").textContent = t("close");
+  document.getElementById("guideStart").textContent = "▸ " + t("guide");
+  document.getElementById("tour").hidden = false;
   document.getElementById("tourClose").focus();
 }
 function closeTour(){
   document.getElementById("tour").hidden = true;
   try{ localStorage.setItem(TOURKEY, "done"); }catch(e){}
 }
-document.getElementById("tourClose").onclick = closeTour;
-document.getElementById("tourBtn").onclick = () => {
-  document.getElementById("menuPanel").hidden = true;
+function openHelp(){
+  const p = document.getElementById("menuPanel");
+  p.hidden = true;
   document.getElementById("menuBtn").setAttribute("aria-expanded","false");
   openTour();
-};
+}
+document.getElementById("tourClose").onclick = closeTour;
+document.getElementById("tourBtn").onclick = openHelp;
+document.getElementById("helpBtn").onclick = openHelp;
 document.getElementById("tour").addEventListener("click", e => { if(e.target.id === "tour") closeTour(); });
+
+/* ---------- guided tour: spotlight + coach marks ---------- */
+const GUIDE = {
+  es:[
+    {sel:"#filters", text:"Aquí decides qué entra en el mazo: <b>dominio y subdominio</b>, <b>temas</b> (tipo de trampa), <b>todas las trampas</b>, <b>barajar</b> y <b>nuevo mazo</b>. Si no marcas nada, entran las 79."},
+    {sel:"#app .scenario", text:"Cada carta abre con un <b>escenario real de trabajo</b>. Lee rápido el contexto: la pregunta sale de ahí."},
+    {sel:"#app .question", text:"La pregunta, con cuatro opciones. Responde con <kbd>1</kbd>–<kbd>4</kbd> o haciendo clic."},
+    {sel:"#app .acts", text:"<b>Arriba y siempre a mano</b>: atrás, repetir, marcar con estrella y siguiente. No hace falta bajar a leer toda la explicación para pasar de carta."},
+    {sel:null, text:"Al responder se despliegan la respuesta real, por qué falla cada distractor y la cita literal del material oficial. Vuelve a ellas cuando falles, o usa <b>Fallidas</b> para repasarlas en bloque."},
+    {sel:"#menuBtn", text:"En ☰ tienes <b>Progreso</b>, <b>Todas</b>, <b>Fallidas</b>, idioma y tema claro/oscuro. El <b>?</b> de al lado reabre esta ayuda siempre que quieras."}
+  ],
+  en:[
+    {sel:"#filters", text:"This is what goes into the deck: <b>domain &amp; subdomain</b>, <b>topics</b> (trap type), <b>all traps</b>, <b>shuffle</b> and <b>new deck</b>. Select nothing and all 79 cards are in."},
+    {sel:"#app .scenario", text:"Every card opens with a <b>real work scenario</b>. Read the context quickly — the question comes out of it."},
+    {sel:"#app .question", text:"The question, with four options. Answer with <kbd>1</kbd>–<kbd>4</kbd> or a click."},
+    {sel:"#app .acts", text:"<b>Up here, always in reach</b>: back, repeat, star and next. You do not have to scroll through the whole explanation to move on."},
+    {sel:null, text:"Answering opens the correct answer, why every distractor fails and a verbatim quote from the official material. Come back to it when you miss, or use <b>Failed</b> to review them in bulk."},
+    {sel:"#menuBtn", text:"The ☰ menu holds <b>Progress</b>, <b>All</b>, <b>Failed</b>, language and light/dark theme. The <b>?</b> next to it reopens this help whenever you want."}
+  ]
+};
+let gi = 0, guideOn = false;
+function startGuide(){
+  closeTour();
+  view.tab = "study"; view.answered = false; view.picked = null;
+  paintMenu(); render();
+  gi = 0; guideOn = true;
+  showStep();
+}
+function showStep(){
+  if(!guideOn) return;
+  const steps = GUIDE[lang === "en" ? "en" : "es"];
+  const spot = document.getElementById("spot"), coach = document.getElementById("coach");
+  if(gi >= steps.length) return endGuide();
+  if(gi < 0) gi = 0;
+  const st = steps[gi];
+  const el = st.sel ? document.querySelector(st.sel) : null;
+  if(el){
+    el.scrollIntoView({block:"center"});
+    const r = el.getBoundingClientRect(), pad = 6;
+    spot.hidden = false;
+    spot.style.left = (r.left - pad) + "px";
+    spot.style.top = (r.top - pad) + "px";
+    spot.style.width = (r.width + pad*2) + "px";
+    spot.style.height = (r.height + pad*2) + "px";
+    coach.hidden = false;
+    const h = coach.offsetHeight || 200, w = coach.offsetWidth || 340;
+    let top = r.bottom + 14;
+    if(top + h > innerHeight - 10) top = Math.max(12, r.top - h - 14);
+    let left = Math.min(Math.max(12, r.left), innerWidth - w - 12);
+    coach.style.top = top + "px"; coach.style.left = left + "px";
+  } else {
+    spot.hidden = true;
+    coach.hidden = false;
+    coach.style.left = Math.max(12, (innerWidth - (coach.offsetWidth || 340)) / 2) + "px";
+    coach.style.top = Math.max(12, innerHeight/2 - (coach.offsetHeight || 200)/2) + "px";
+  }
+  coach.innerHTML = `<div class="n">${t("guide")} · ${gi+1}/${steps.length}</div><p>${st.text}</p>
+    <div class="nav">
+      <button id="gSkip">${t("skip")}</button>
+      <button id="gBack" ${gi === 0 ? "disabled" : ""}>${t("back")}</button>
+      <button class="primary" id="gNext">${gi === steps.length - 1 ? t("done") : t("next")}</button>
+    </div>`;
+  document.getElementById("gSkip").onclick = endGuide;
+  document.getElementById("gBack").onclick = () => { gi--; showStep(); };
+  document.getElementById("gNext").onclick = () => { gi++; showStep(); };
+  document.getElementById("gNext").focus();
+}
+function endGuide(){
+  guideOn = false;
+  document.getElementById("spot").hidden = true;
+  document.getElementById("coach").hidden = true;
+  try{ localStorage.setItem(TOURKEY, "done"); }catch(e){}
+}
+document.getElementById("guideStart").onclick = startGuide;
+addEventListener("resize", () => { if(guideOn) showStep(); });
 
 /* ---------- boot ---------- */
 function render(){
@@ -722,6 +905,7 @@ function render(){
   const el = document.getElementById("app");
   if(view.tab === "stats") return renderStats(el);
   if(view.tab === "browse") return renderBrowse(el);
+  if(view.tab === "failed") return renderFailed(el);
   renderStudy(el);
 }
 applyTheme();

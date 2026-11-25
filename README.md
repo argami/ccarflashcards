@@ -28,8 +28,11 @@ Every session is a **60-card deck** built from the filters you pick — nothing 
 - *Shuffle* — on deals a random 60, off deals them in card-id order.
 - *New deck* — re-deals at any time; card-level progress is kept.
 
-The ☰ menu holds the three views (Study / Progress / All), a **Quick tour** (also shown automatically the
-first time you open the app), the ES / EN / ES+EN language switch and the light / dark theme. All three choices — language, theme, filters, deck position — persist in
+The ☰ menu holds the views (Study / Progress / All / **Failed** — everything you have got wrong, most-missed
+first), the **Help** modal (also on the `?` button in the header, and shown automatically the first time you
+open the app) with a guided step-by-step tour, the ES / EN / ES+EN language switch and the light / dark theme.
+Controls sit **above** the card — back, repeat, star, next — so you never scroll past the explanation to move
+on; `space` also advances. All three choices — language, theme, filters, deck position — persist in
 `localStorage` for that browser. It does not sync between devices and clearing site data resets it.
 Per-card scheduling is a Leitner ladder (0-1-3-7-16 days).
 
