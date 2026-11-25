@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -113,7 +113,7 @@ const DATA = {"cards": [{"id": "D1-1.1-001", "domain": 1, "subdomain": "1.1", "t
 const KEY = "ccarf_progress_v1";
 const ROWS = ["A","B","C","D"];
 const LKEY = "ccarf_lang_v1";
-let lang = localStorage.getItem(LKEY) || "es";   // "es" | "en" | "both"
+let lang = localStorage.getItem(LKEY) || "en";   // por defecto inglés; el usuario manda vía LKEY
 const T = {
   es:{study:"Estudiar",stats:"Progreso",browse:"Todas",allSub:"Todos",allTraps:"Todas las trampas",
       onlyFailed:"Solo falladas",shuffle:"Barajar",empty:"Nada pendiente con estos filtros.",
