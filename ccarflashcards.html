@@ -1186,7 +1186,8 @@ const TOUR = {
         "Los controles están <b>arriba de la carta</b>: atrás, repetir, marcar con estrella y siguiente. <kbd>espacio</kbd> también pasa de carta sin bajar a leer la explicación.",
         "<b>Tema</b> y <b>Trampas</b> recortan el mazo: el tema es el subdominio del examen, la trampa es el fallo que la pregunta provoca. Sin marcar nada entran todas; marca una o varias y solo entran esas.",
         "Con <b>Barajar</b> el mazo sale desordenado; sin marcar, en orden de ficha. <b>Nuevo mazo</b> reparte otros 60 sin borrar tu progreso.",
-        "En el menú ☰ están Progreso, Todas y <b>Fallidas</b> —el listado de todo lo que has fallado—, además del idioma y el tema. El botón <b>?</b> reabre esta ayuda cuando quieras."],
+        "En el menú ☰ están Progreso, Todas y <b>Fallidas</b> —el listado de todo lo que has fallado—, además del idioma y el tema. El botón <b>?</b> reabre esta ayuda cuando quieras.",
+        "Para <b>llevarte el progreso a otro navegador</b> sin crear ninguna cuenta: <b>☰ → Sincronizar</b>. Te da un código tipo <b>XXXXX-XXXXX</b>; lo pegas en ese mismo apartado del otro navegador y los dos quedan en paso — progreso, estrellas, el mazo en curso y tus ajustes. Ese código es la única credencial: si lo pierdes, no hay forma de recuperarlo. Y no hace falta para estudiar: sin código, todo funciona igual, solo que únicamente en ese navegador."],
       cta:"Entendido"},
   en:{title:"How this works, in thirty seconds", sub:"Quick tour",
       steps:[
@@ -1195,7 +1196,8 @@ const TOUR = {
         "The controls sit <b>above the card</b>: back, repeat, star and next. <kbd>space</kbd> also moves on without scrolling through the explanation.",
         "<b>Topic</b> and <b>Traps</b> narrow the deck: the topic is the exam subdomain, the trap is the failure the question provokes. Select nothing and every trap is in; select one or more and only those are dealt.",
         "<b>Shuffle</b> deals in random order; unchecked, in card order. <b>New deck</b> deals another 60 without touching your progress.",
-        "The ☰ menu holds Progress, All cards and <b>Failed</b> — everything you have missed — plus language and theme. The <b>?</b> button reopens this help any time."],
+        "The ☰ menu holds Progress, All cards and <b>Failed</b> — everything you have missed — plus language and theme. The <b>?</b> button reopens this help any time.",
+        "To <b>carry your progress to another browser</b> with no account at all: <b>☰ → Sync</b>. It gives you a code like <b>XXXXX-XXXXX</b>; paste it into the same panel in the other browser and both stay in step — progress, stars, the deck in play and your settings. That code is the only credential: lose it and there is no recovery. And you do not need it to study: with no code everything works the same, on that one browser."],
       cta:"Got it"}
 };
 const TOURKEY = "ccarf_tour_v1";
@@ -1242,7 +1244,8 @@ const GUIDE = {
     {sel:"#app .question", text:"La pregunta, con cuatro opciones (cinco y varias correctas en las de respuesta múltiple). Responde con <kbd>1</kbd>–<kbd>5</kbd> o haciendo clic."},
     {sel:"#app .acts", text:"<b>Arriba y siempre a mano</b>: atrás, repetir, marcar con estrella y siguiente. No hace falta bajar a leer toda la explicación para pasar de carta."},
     {sel:null, text:"Al responder se despliegan la respuesta real, por qué falla cada distractor y la cita literal del material oficial. Vuelve a ellas cuando falles, o usa <b>Fallidas</b> para repasarlas en bloque."},
-    {sel:"#menuBtn", text:"En ☰ tienes <b>Progreso</b>, <b>Todas</b>, <b>Fallidas</b>, idioma y tema claro/oscuro. El <b>?</b> de al lado reabre esta ayuda siempre que quieras."}
+    {sel:"#menuBtn", text:"En ☰ tienes <b>Progreso</b>, <b>Todas</b>, <b>Fallidas</b>, idioma y tema claro/oscuro. El <b>?</b> de al lado reabre esta ayuda siempre que quieras."},
+    {sel:"#menuBtn", text:"Y en ese mismo menú, <b>Sincronizar</b>: crea un código como <b>XXXXX-XXXXX</b> y, al pegarlo en otro navegador, los dos comparten progreso, estrellas, mazo y ajustes. Sin cuentas ni correo. El código es la única llave: si se pierde, no hay recuperación."}
   ],
   en:[
     {sel:"#filters", text:"This is what goes into the deck: <b>topic</b> (subdomain), <b>traps</b> (the failure the question provokes), <b>shuffle</b> and <b>new deck</b>. Select nothing and every card is in."},
@@ -1250,7 +1253,8 @@ const GUIDE = {
     {sel:"#app .question", text:"The question, with four options (five, several correct, on multiple-response cards). Answer with <kbd>1</kbd>–<kbd>5</kbd> or a click."},
     {sel:"#app .acts", text:"<b>Up here, always in reach</b>: back, repeat, star and next. You do not have to scroll through the whole explanation to move on."},
     {sel:null, text:"Answering opens the correct answer, why every distractor fails and a verbatim quote from the official material. Come back to it when you miss, or use <b>Failed</b> to review them in bulk."},
-    {sel:"#menuBtn", text:"The ☰ menu holds <b>Progress</b>, <b>All</b>, <b>Failed</b>, language and light/dark theme. The <b>?</b> next to it reopens this help whenever you want."}
+    {sel:"#menuBtn", text:"The ☰ menu holds <b>Progress</b>, <b>All</b>, <b>Failed</b>, language and light/dark theme. The <b>?</b> next to it reopens this help whenever you want."},
+    {sel:"#menuBtn", text:"And in that same menu, <b>Sync</b>: it makes a code like <b>XXXXX-XXXXX</b>, and pasting it in another browser keeps both in step — progress, stars, deck and settings. No accounts, no email. The code is the only key: lose it and there is no recovery."}
   ]
 };
 let gi = 0, guideOn = false;
