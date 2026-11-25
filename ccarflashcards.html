@@ -144,6 +144,22 @@
   kbd{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:0 4px;font-size:10.5px}
   .sect{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
     margin:26px 0 8px;font-weight:600}
+  /* quick tour */
+  .overlay{position:fixed;inset:0;z-index:60;background:rgba(12,14,18,.5);display:flex;
+    align-items:center;justify-content:center;padding:18px}
+  .overlay[hidden]{display:none}
+  .tour{background:var(--bg);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+    max-width:520px;width:100%;max-height:88vh;overflow:auto;padding:22px 24px}
+  .tour h2{margin:0 0 4px;font-size:17px;letter-spacing:-.01em}
+  .tour .sub{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+  .tour ol{margin:0;padding-left:0;list-style:none;counter-reset:s}
+  .tour li{counter-increment:s;position:relative;padding:0 0 12px 30px;font-size:14px;line-height:1.5;
+    color:var(--fg)}
+  .tour li::before{content:counter(s);position:absolute;left:0;top:1px;width:20px;height:20px;
+    border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;
+    display:flex;align-items:center;justify-content:center}
+  .tour-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+  .tour kbd{font-size:10px}
   footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--line);
     font-size:11px;color:var(--muted);padding:7px 18px;display:flex;justify-content:space-between;gap:12px}
   @media(max-width:640px){
@@ -181,6 +197,9 @@
           </div>
         </div>
         <div class="menu-sec">
+          <button class="menu-item" id="tourBtn" role="menuitem"><span data-lbl="tour"></span><span class="tick">?</span></button>
+        </div>
+        <div class="menu-sec">
           <div class="menu-lbl" id="mLblTheme"></div>
           <div class="seg" id="themeseg">
             <button data-theme="light"></button><button data-theme="dark"></button>
@@ -209,6 +228,15 @@
   </div>
 
   <div id="app"></div>
+</div>
+
+<div class="overlay" id="tour" hidden role="dialog" aria-modal="true" aria-labelledby="tourTitle">
+  <div class="tour">
+    <h2 id="tourTitle"></h2>
+    <p class="sub" id="tourSub"></p>
+    <ol id="tourSteps"></ol>
+    <div class="tour-foot"><button class="primary" id="tourClose"></button></div>
+  </div>
 </div>
 <footer>
   <span id="footKeys"></span>
@@ -242,6 +270,7 @@ const T = {
       confirmReset:"¿Borrar todo el progreso?",total:"cartas totales",cardsN:"cartas",
       deckDone:"Mazo completado",deckAcc:"Aciertos del mazo",newDeck:"Repartir otro mazo de 60",
       all:"Todos",clear:"Quitar",keys:"responder · espacio siguiente",filterHint:"Sin selección = todo",
+      tour:"Cómo se usa",
       kicker:"Claude Certified Architect — Foundations · 720/1000 para aprobar"},
   en:{study:"Study",stats:"Progress",browse:"All",menu:"Menu",go:"Go to",language:"Language",
       theme:"Theme",light:"Light",dark:"Dark",
@@ -258,6 +287,7 @@ const T = {
       confirmReset:"Delete all progress?",total:"cards in total",cardsN:"cards",
       deckDone:"Deck complete",deckAcc:"Cards correct in this deck",newDeck:"Deal another 60",
       all:"All",clear:"Clear",keys:"answer · space for next",filterHint:"Nothing selected = everything",
+      tour:"Quick tour",
       kicker:"Claude Certified Architect — Foundations · 720/1000 to pass"}
 };
 const t  = k => (lang === "en" ? T.en : T.es)[k];
@@ -446,12 +476,14 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => {
   if(e.key === "Escape"){
+    if(!document.getElementById("tour").hidden){ closeTour(); return; }
     view.open = null; paintFilters();
     const p = document.getElementById("menuPanel"); p.hidden = true;
     document.getElementById("menuBtn").setAttribute("aria-expanded","false");
     return;
   }
   if(view.tab !== "study" || !document.getElementById("menuPanel").hidden) return;
+  if(!document.getElementById("tour").hidden) return;
   if(["1","2","3","4"].includes(e.key) && !view.answered && curCard()){ answer(ROWS[+e.key-1]); }
   else if((e.key === " " || e.key === "Enter") && view.answered){ e.preventDefault(); grade("good"); }
 });
@@ -640,6 +672,50 @@ function renderBrowse(el){
   document.getElementById("foot").textContent = `${p.length} ${t("inFilter")}`;
 }
 
+/* ---------- quick tour ---------- */
+const TOUR = {
+  es:{title:"Cómo se usa en treinta segundos", sub:"Guía rápida",
+      steps:[
+        "Cada sesión es un <b>mazo de 60 cartas</b> sacadas de los filtros de arriba. Si no marcas nada, entran todas.",
+        "Elige una opción con las teclas <kbd>1</kbd>–<kbd>4</kbd> o con el ratón. Verás la respuesta correcta, por qué falla cada distractor y la cita del material oficial.",
+        "Pulsa <kbd>espacio</kbd> para pasar de carta. Los botones Otra vez / Difícil / Bien / Fácil solo deciden cuándo vuelve a salir.",
+        "<b>Dominio y subdominio</b> y <b>Temas</b> recortan el mazo. Con <b>Todas las trampas</b> marcada el filtro de temas se ignora.",
+        "Con <b>Barajar</b> el mazo sale desordenado; sin marcar, en orden de ficha. <b>Nuevo mazo</b> reparte otros 60 sin borrar tu progreso.",
+        "En el menú ☰ están Progreso, Todas, el idioma y el tema claro/oscuro. Todo se guarda en este navegador."],
+      cta:"Entendido"},
+  en:{title:"How this works, in thirty seconds", sub:"Quick tour",
+      steps:[
+        "Every session is a <b>60-card deck</b> dealt from the filters above. Select nothing and everything is included.",
+        "Pick an option with <kbd>1</kbd>–<kbd>4</kbd> or the mouse. You get the correct answer, why every distractor fails, and a verbatim quote from the official material.",
+        "Press <kbd>space</kbd> for the next card. Again / Hard / Good / Easy only decide when that card comes back.",
+        "<b>Domain &amp; subdomain</b> and <b>Topics</b> narrow the deck. With <b>All traps</b> checked the topic filter is ignored.",
+        "<b>Shuffle</b> deals in random order; unchecked, in card order. <b>New deck</b> deals another 60 without touching your progress.",
+        "The ☰ menu holds Progress, All cards, the language switch and the light/dark theme. Everything is saved in this browser."],
+      cta:"Got it"}
+};
+const TOURKEY = "ccarf_tour_v1";
+function openTour(){
+  const d = TOUR[lang === "en" ? "en" : "es"];
+  document.getElementById("tourTitle").textContent = d.title;
+  document.getElementById("tourSub").textContent = d.sub;
+  document.getElementById("tourSteps").innerHTML = d.steps.map(s => `<li>${s}</li>`).join("");
+  document.getElementById("tourClose").textContent = d.cta;
+  const o = document.getElementById("tour");
+  o.hidden = false;
+  document.getElementById("tourClose").focus();
+}
+function closeTour(){
+  document.getElementById("tour").hidden = true;
+  try{ localStorage.setItem(TOURKEY, "done"); }catch(e){}
+}
+document.getElementById("tourClose").onclick = closeTour;
+document.getElementById("tourBtn").onclick = () => {
+  document.getElementById("menuPanel").hidden = true;
+  document.getElementById("menuBtn").setAttribute("aria-expanded","false");
+  openTour();
+};
+document.getElementById("tour").addEventListener("click", e => { if(e.target.id === "tour") closeTour(); });
+
 /* ---------- boot ---------- */
 function render(){
   paintMenu(); paintFilters(); wireFilters();
@@ -651,6 +727,7 @@ function render(){
 applyTheme();
 if(!deck) dealDeck();
 render();
+try{ if(localStorage.getItem(TOURKEY) !== "done") openTour(); }catch(e){}
 </script>
 </body>
 </html>
