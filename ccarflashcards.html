@@ -141,6 +141,8 @@
     margin:26px 0 8px;font-weight:600}
   .hdr-r{display:flex;align-items:center;gap:8px}
   #helpBtn{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;font-size:12.5px}
+  .hdr-r button{min-height:34px;display:inline-flex;align-items:center}
+  #themeBtn{justify-content:center;padding:6px 9px;font-size:14px;line-height:1}
   #helpBtn .q{font-weight:700;color:var(--accent)}
 
   /* study action bar: stays above the card, never below the answer */
@@ -186,6 +188,7 @@
     h1{font-size:12.5px;letter-spacing:.09em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .kicker{font-size:9px;letter-spacing:.05em;line-height:1.35}
     #helpBtn,#menuBtn{padding:6px 9px;font-size:11.5px}
+    #themeBtn{padding:6px 7px;font-size:13px}
     .acts button{padding:7px 9px;font-size:11.5px}
     .acts #aNext{min-width:78px}
     .coach{padding:13px 14px}
@@ -206,6 +209,7 @@
       <div class="kicker" id="kicker"></div>
     </div>
     <div class="hdr-r">
+      <button id="themeBtn" title="" aria-label=""></button>
       <button id="helpBtn" aria-haspopup="dialog" title="Help"><span class="q">?</span><span id="helpLabel"></span></button>
       <div class="user">
       <button id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="menuPanel">
@@ -503,6 +507,10 @@ function paintMenu(){
   document.querySelectorAll("[data-lbl]").forEach(el => { el.textContent = t(el.dataset.lbl); });
   document.getElementById("footKeys").innerHTML = `<kbd>1</kbd>–<kbd>4</kbd> ${t("keys")}`;
   document.getElementById("helpLabel").textContent = t("help");
+  const tb = document.getElementById("themeBtn");
+  tb.textContent = theme === "dark" ? "☀" : "☾";
+  tb.title = t(theme === "dark" ? "light" : "dark");
+  tb.setAttribute("aria-label", tb.title);
 }
 function applyTheme(){
   document.documentElement.dataset.theme = theme;
@@ -822,6 +830,10 @@ function openHelp(){
 document.getElementById("tourClose").onclick = closeTour;
 document.getElementById("tourBtn").onclick = openHelp;
 document.getElementById("helpBtn").onclick = openHelp;
+document.getElementById("themeBtn").onclick = () => {
+  theme = theme === "dark" ? "light" : "dark";
+  applyTheme(); paintMenu(); render();
+};
 document.getElementById("tour").addEventListener("click", e => { if(e.target.id === "tour") closeTour(); });
 
 /* ---------- guided tour: spotlight + coach marks ---------- */
