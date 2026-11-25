@@ -106,6 +106,12 @@
   .opt.right{border-color:var(--green);background:var(--green-bg)}
   .opt.wrong{border-color:var(--red);background:var(--red-bg)}
   .opt.dim{opacity:.55}
+  .opt.sel{border-color:var(--accent);background:var(--panel)}
+  .opt .mark{flex:0 0 auto;width:15px;height:15px;margin:2px 0 0 auto;border:1px solid var(--muted);
+    border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff}
+  .opt.sel .mark,.opt.right .mark{background:var(--accent);border-color:var(--accent)}
+  .checkrow{display:flex;align-items:center;gap:10px;margin:4px 0 2px;flex-wrap:wrap}
+  .checkrow .cnt{font-size:12px;color:var(--muted)}
   .verdict{margin:18px 0 10px;font-size:15px;font-weight:600}
   .verdict.ok{color:var(--green)} .verdict.ko{color:var(--red)}
   .box{border-left:3px solid var(--line);padding:11px 14px;border-radius:3px;margin-bottom:11px;
@@ -256,6 +262,12 @@
       </button>
       <div class="dd-panel" id="panelTrap" hidden></div>
     </div>
+    <div class="dd" id="ddScen">
+      <button class="dd-btn" data-dd="scen" aria-expanded="false" aria-haspopup="true">
+        <span id="lblScen"></span><span class="caret">▾</span>
+      </button>
+      <div class="dd-panel" id="panelScen" hidden></div>
+    </div>
     <label class="fcheck"><input type="checkbox" id="allTraps"><span data-lbl="allTraps"></span></label>
     <label class="fcheck"><input type="checkbox" id="shuffle"><span data-lbl="shuffle"></span></label>
     <button class="primary" id="deal" data-lbl="deal"></button>
@@ -288,6 +300,15 @@ const DKEY = "ccarf_deck_v1";
 const LKEY = "ccarf_lang_v1";
 const TKEY = "ccarf_theme_v1";
 const ROWS = ["A","B","C","D"];
+const LETTERS = ["A","B","C","D","E"];
+const SCENARIOS = {1:"customer_support", 2:"research_pipeline", 3:"claude_code_cicd",
+                   4:"developer_productivity", 5:"data_extraction", 6:"agentic_ai_tools"};
+const isMulti = c => c.item_type === "multi" || Array.isArray(c.correct);
+const optKeys = c => Object.keys(c.options).sort();
+const correctKeys = c => (Array.isArray(c.correct) ? c.correct.slice() : [c.correct]).sort();
+const pickedKeys = p => (Array.isArray(p) ? p.slice() : (p ? [p] : [])).sort();
+const sameSet = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+const isRight = (c, picked) => pickedKeys(picked).length > 0 && sameSet(pickedKeys(picked), correctKeys(c));
 const DECK_SIZE = 60;
 
 let lang  = localStorage.getItem(LKEY) || "en";
@@ -302,6 +323,8 @@ const T = {
       best:"mejor",inFilter:"cartas en el filtro",deckOf:"de",
       correct:"✅ Correcto",incorrect:(k)=>`❌ Incorrecto — la respuesta era ${k}`,
       you:"Tu respuesta",real:"Respuesta real",others:"Por qué fallan las demás",trap:"Trampa",
+      scenario:"Escenario",allScen:"Todos los escenarios",selectN:"Selecciona",check:"Comprobar",
+      partial:"Te falta alguna respuesta correcta",missing:"Te has dejado",
       back:"Atrás",repeat:"Repetir",next:"Siguiente",star:"Marcar",starred:"Marcada",
       failed:"Fallidas",help:"Ayuda",close:"Cerrar",guide:"Guía paso a paso",skip:"Saltar",done:"Listo",
       failedTitle:"Cartas falladas",failedHint:"Todo lo que has fallado al menos una vez, de más a menos fallos.",
@@ -323,6 +346,8 @@ const T = {
       best:"best",inFilter:"cards in filter",deckOf:"of",
       correct:"✅ Correct",incorrect:(k)=>`❌ Incorrect — the answer was ${k}`,
       you:"Your answer",real:"Correct answer",others:"Why the others fail",trap:"Trap",
+      scenario:"Scenario",allScen:"All scenarios",selectN:"Select",check:"Check",
+      partial:"You missed a correct option",missing:"You missed",
       back:"Back",repeat:"Repeat",next:"Next",star:"Star",starred:"Starred",
       failed:"Failed",help:"Help",close:"Close",guide:"Guided tour",skip:"Skip",done:"Done",
       failedTitle:"Missed cards",failedHint:"Everything you have got wrong at least once, most-missed first.",
@@ -364,7 +389,10 @@ const subsOfDomain = d => [...new Set(DATA.cards.filter(c => String(c.domain) ==
 function loadDeck(){
   try{
     const d = JSON.parse(localStorage.getItem(DKEY));
-    if(d && Array.isArray(d.ids) && d.f && Array.isArray(d.f.subs) && Array.isArray(d.f.traps)) return d;
+    if(d && Array.isArray(d.ids) && d.f && Array.isArray(d.f.subs) && Array.isArray(d.f.traps)){
+      if(!Array.isArray(d.f.scens)) d.f.scens = [];
+      return d;
+    }
   }catch(e){}
   return null;
 }
@@ -379,13 +407,14 @@ function toggleStar(id){
 }
 
 function filters(){
-  if(!deck) deck = {ids:[], idx:0, answers:{}, f:{subs:[], traps:[], allTraps:true, shuffle:true}};
+  if(!deck) deck = {ids:[], idx:0, answers:{}, f:{subs:[], traps:[], scens:[], allTraps:true, shuffle:true}};
   return deck.f;
 }
 function pool(){
   const f = filters();
   return DATA.cards.filter(c =>
     (!f.subs.length || f.subs.includes(c.subdomain)) &&
+    (!f.scens.length || f.scens.includes(c.scenario_ref)) &&
     (f.allTraps || !f.traps.length || f.traps.includes(c.trap.kind))
   );
 }
@@ -421,8 +450,11 @@ function paintFilters(){
   document.getElementById("shuffle").checked = !!f.shuffle;
   document.getElementById("panelSub").hidden = view.open !== "sub";
   document.getElementById("panelTrap").hidden = view.open !== "trap";
+  document.getElementById("panelScen").hidden = view.open !== "scen";
+  document.querySelector("#ddScen .dd-btn").setAttribute("aria-expanded", String(view.open === "scen"));
+  document.getElementById("lblScen").textContent =
+    f.scens.length ? `${t("scenario")} · ${f.scens.length}` : t("allScen");
   const trapBtn = document.querySelector("#ddTrap .dd-btn");
-  trapBtn.disabled = !!f.allTraps;
   trapBtn.setAttribute("aria-expanded", String(view.open === "trap"));
   document.querySelector("#ddSub .dd-btn").setAttribute("aria-expanded", String(view.open === "sub"));
 
@@ -439,13 +471,24 @@ function paintFilters(){
         }).join("");
     }).join("");
 
+  const psc = document.getElementById("panelScen");
+  const present = [...new Set(DATA.cards.map(c => c.scenario_ref).filter(Boolean))].sort();
+  psc.innerHTML = `<div class="dd-head"><span>${t("scenario")}</span>
+      <button data-clear="scen" type="button">${t("clear")}</button></div>` +
+    (present.length ? present.map(r => {
+      const n = DATA.cards.filter(c => c.scenario_ref === r).length;
+      return `<label class="chk"><input type="checkbox" data-scen="${r}" ${f.scens.includes(r) ? "checked" : ""}>${SCENARIOS[r] || r} <span style="opacity:.6">(${n})</span></label>`;
+    }).join("") : `<div class="chk" style="cursor:default;color:var(--muted)">—</div>`);
+
   const pt = document.getElementById("panelTrap");
   pt.innerHTML = `<div class="dd-head"><span>${t("topics")}</span>
       <button data-clear="trap" type="button">${t("clear")}</button></div>` +
     TRAPS.map(k => {
       const n = DATA.cards.filter(c => c.trap.kind === k).length;
-      return `<label class="chk"><input type="checkbox" data-trap="${k}" ${f.traps.includes(k) ? "checked" : ""}>${k} <span style="opacity:.6">(${n})</span></label>`;
+      const sel = f.allTraps || f.traps.includes(k);
+      return `<label class="chk"><input type="checkbox" data-trap="${k}" ${sel ? "checked" : ""}>${k} <span style="opacity:.6">(${n})</span></label>`;
     }).join("");
+  wireFilters();          // panels are rebuilt on every open: rebind them here
 }
 
 function wireFilters(){
@@ -455,7 +498,9 @@ function wireFilters(){
     paintFilters();
   });
   document.getElementById("allTraps").onchange = e => {
-    filters().allTraps = e.target.checked;
+    const f = filters();
+    f.allTraps = e.target.checked;
+    f.traps = f.allTraps ? [] : [...TRAPS];
     dealDeck(); paintFilters(); render();
   };
   document.getElementById("shuffle").onchange = e => {
@@ -467,7 +512,9 @@ function wireFilters(){
   document.querySelectorAll("[data-clear]").forEach(b => b.onclick = e => {
     e.stopPropagation();
     const k = b.dataset.clear;
-    if(k === "sub") filters().subs = []; else filters().traps = [];
+    if(k === "sub") filters().subs = [];
+    else if(k === "scen") filters().scens = [];
+    else filters().traps = [];
     dealDeck(); paintFilters(); render();
   });
   document.querySelectorAll("#panelSub input[data-sub]").forEach(inp => inp.onchange = () => {
@@ -482,9 +529,17 @@ function wireFilters(){
       : f.subs.filter(x => !subs.includes(x));
     dealDeck(); paintFilters(); render();
   });
+  document.querySelectorAll("#panelScen input[data-scen]").forEach(inp => inp.onchange = () => {
+    const f = filters(), r = Number(inp.dataset.scen);
+    f.scens = inp.checked ? [...new Set([...f.scens, r])].sort((a,b)=>a-b) : f.scens.filter(x => x !== r);
+    dealDeck(); paintFilters(); render();
+  });
   document.querySelectorAll("#panelTrap input[data-trap]").forEach(inp => inp.onchange = () => {
     const f = filters(), k = inp.dataset.trap;
-    f.traps = inp.checked ? [...new Set([...f.traps, k])].sort() : f.traps.filter(x => x !== k);
+    let cur = f.allTraps ? [...TRAPS] : [...f.traps];
+    cur = inp.checked ? [...new Set([...cur, k])] : cur.filter(x => x !== k);
+    f.allTraps = cur.length === TRAPS.length;
+    f.traps = f.allTraps ? [] : cur.sort();
     dealDeck(); paintFilters(); render();
   });
 }
@@ -547,7 +602,14 @@ document.addEventListener("keydown", e => {
   }
   if(view.tab !== "study" || !document.getElementById("menuPanel").hidden) return;
   if(!document.getElementById("tour").hidden) return;
-  if(["1","2","3","4"].includes(e.key) && !view.answered && curCard()){ answer(ROWS[+e.key-1]); }
+  const cc = curCard();
+  if(!view.answered && cc && LETTERS.includes(LETTERS[+e.key-1]) && e.key >= "1" && e.key <= "5" && optKeys(cc).includes(LETTERS[+e.key-1])){
+    if(isMulti(cc)) pick(LETTERS[+e.key-1]); else recordAnswer(cc, LETTERS[+e.key-1]);
+  }
+  else if(cc && isMulti(cc) && !view.answered && e.key === "Enter"){
+    e.preventDefault();
+    if(pickedKeys(view.picked).length === (cc.select_n || 2)) submitMulti();
+  }
   else if((e.key === " " || e.key === "Enter") && view.answered){ e.preventDefault(); goNext(); }
   else if(e.key === "Backspace" || e.key === "ArrowLeft"){ e.preventDefault(); goBack(); }
   else if(e.key === "ArrowRight" && view.answered){ e.preventDefault(); goNext(); }
@@ -593,27 +655,40 @@ function renderStudy(el){
     </div>
     <div class="meta"><span class="pill">D${c.domain} · ${c.subdomain}</span>
       <span class="pill">${c.difficulty}</span>
-      <span class="pill">${c.trap.kind}</span></div>
+      <span class="pill">${c.trap.kind}</span>` +
+      (isMulti(c) ? `<span class="pill">${t("selectN")} ${c.select_n}</span>` : "") +
+      (c.scenario_ref ? `<span class="pill">${SCENARIOS[c.scenario_ref] || c.scenario_ref}</span>` : "") + `</div>
     <div class="scenario">${h(c.scenario)}</div>
     <div class="question">${h(c.question)}</div>
-    <div>` + ROWS.map(k => {
+    <div>` + optKeys(c).map(k => {
+      const corr = correctKeys(c), picked = pickedKeys(view.picked);
       let cls = "opt";
       if(view.answered){
         cls += " locked";
-        if(k === c.correct) cls += " right";
-        else if(k === view.picked) cls += " wrong";
+        if(corr.includes(k)) cls += " right";
+        else if(picked.includes(k)) cls += " wrong";
         else cls += " dim";
-      }
-      return `<button class="${cls}" data-k="${k}"><span class="key">${k}</span><span>${h(c.options[k])}</span></button>`;
+      } else if(isMulti(c) && picked.includes(k)) cls += " sel";
+      const mark = isMulti(c) ? `<span class="mark">${(view.answered ? corr.includes(k) : pickedKeys(view.picked).includes(k)) ? "✓" : ""}</span>` : "";
+      return `<button class="${cls}" data-k="${k}"><span class="key">${k}</span><span>${h(c.options[k])}</span>${mark}</button>`;
     }).join("") + `</div>`;
 
+  if(isMulti(c) && !view.answered){
+    const n = pickedKeys(view.picked).length, need = c.select_n || 2;
+    html += `<div class="checkrow">
+      <button class="primary" id="aCheck" ${n === need ? "" : "disabled"}>${t("check")}</button>
+      <span class="cnt">${t("selectN")} ${need} · ${n}/${need}</span></div>`;
+  }
+
   if(view.answered){
-    const ok = view.picked === c.correct;
-    html += `<div class="verdict ${ok?"ok":"ko"}">${ok ? t("correct") : t("incorrect")(c.correct)}</div>`;
+    const ok = isRight(c, view.picked);
+    html += `<div class="verdict ${ok?"ok":"ko"}">${ok ? t("correct") : t("incorrect")(correctKeys(c).join("+"))}</div>`;
     html += explain(c, ok) + CITE(c);
   }
   el.innerHTML = html;
-  if(!view.answered) el.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(b.dataset.k));
+  if(!view.answered) el.querySelectorAll(".opt").forEach(b => b.onclick = () => pick(b.dataset.k));
+  const chk = document.getElementById("aCheck");
+  if(chk) chk.onclick = submitMulti;
   document.getElementById("aBack").onclick = goBack;
   document.getElementById("aRepeat").onclick = repeatCard;
   document.getElementById("aNext").onclick = goNext;
@@ -624,7 +699,7 @@ function renderStudy(el){
 function renderDone(el){
   const ids = deck.ids, total = ids.length;
   let ok = 0;
-  ids.forEach(id => { if(deck.answers[id] === byId[id].correct) ok++; });
+  ids.forEach(id => { if(isRight(byId[id], deck.answers[id])) ok++; });
   const acc = total ? Math.round(100*ok/total) : 0;
   const projected = Math.round(100 + 9*acc);
   el.innerHTML = `<div class="done">
@@ -646,10 +721,19 @@ function explain(c, ok){
     const why = c["why_correct_" + lg] || c.why_correct_es || "";
     const rat = c["option_rationales_" + lg] || c.option_rationales_es || {};
     const tip = (c.trap && (c.trap["tip_" + lg] || c.trap.tip_es)) || "";
+    const corr = correctKeys(c), picked = pickedKeys(view.picked);
+    const badPicks = picked.filter(k => !corr.includes(k));
     if(lang === "both") out += `<div class="langtag">${lg === "en" ? "English" : "Español"}</div>`;
-    if(!ok) out += `<div class="box red"><b>${L.you} (${view.picked})</b>${h(rat[view.picked] || "")}</div>`;
-    out += `<div class="box green"><b>${L.real} (${c.correct})</b>${h(c.options[c.correct])}<br><br>${h(why)}</div>`;
-    const others = ROWS.filter(k => k !== c.correct && k !== view.picked);
+    if(!ok && badPicks.length){
+      out += `<div class="box red"><b>${L.you} (${picked.join(", ")})</b>` +
+        badPicks.map(k => `<div style="margin-bottom:6px">${k}: ${h(rat[k] || "")}</div>`).join("") + `</div>`;
+    } else if(!ok){
+      const missed = corr.filter(k => !picked.includes(k)).join(", ");
+      out += `<div class="box amber"><b>${L.partial}</b>${L.missing}: ${missed}</div>`;
+    }
+    out += `<div class="box green"><b>${L.real} (${corr.join(", ")})</b>` +
+      corr.map(k => `${k}: ${h(c.options[k])}`).join("<br>") + `<br><br>${h(why)}</div>`;
+    const others = optKeys(c).filter(k => !corr.includes(k) && !picked.includes(k));
     if(others.length){
       out += `<div class="box"><b>${L.others}</b>` +
         others.map(k => `<div style="margin-bottom:7px"><b style="display:inline;font-size:14px;letter-spacing:0;text-transform:none;color:var(--red)">${k}:</b> ${h(rat[k]||"")}</div>`).join("") + `</div>`;
@@ -659,17 +743,33 @@ function explain(c, ok){
   return out;
 }
 
-function answer(k){
-  const c = curCard(); if(!c || view.answered) return;
+function recordAnswer(c, picked){
   const r = rec(c.id);
-  view.picked = k; view.answered = true;
-  deck.answers[c.id] = k; saveDeck();
-  const ok = k === c.correct;
+  view.picked = picked; view.answered = true;
+  deck.answers[c.id] = picked; saveDeck();
+  const ok = isRight(c, picked);
   r.seen++;
   if(ok){ r.ok++; state.streak++; state.best = Math.max(state.best, state.streak); }
   else { r.bad++; state.streak = 0; }
   save();
   render();
+}
+function pick(k){
+  const c = curCard(); if(!c || view.answered) return;
+  if(!isMulti(c)) return recordAnswer(c, k);
+  const need = c.select_n || 2;
+  const sel = pickedKeys(view.picked);
+  const i = sel.indexOf(k);
+  if(i >= 0) sel.splice(i, 1);
+  else if(sel.length < need) sel.push(k);
+  view.picked = sel.sort();
+  render();
+}
+function submitMulti(){
+  const c = curCard(); if(!c || view.answered) return;
+  const sel = pickedKeys(view.picked);
+  if(sel.length !== (c.select_n || 2)) return;
+  recordAnswer(c, sel);
 }
 
 function goNext(){
@@ -752,7 +852,7 @@ function renderFailed(el){
     rows.map(({c,r}) => `<div class="box red">
         <b>${stars.has(c.id) ? "★ " : ""}${c.id} · ${c.subdomain} · ${c.trap.kind}</b>
         <div style="font-weight:600;margin-bottom:6px">${h(c.question)}</div>
-        <div style="color:var(--green)">${c.correct}: ${h(c.options[c.correct])}</div>
+        <div style="color:var(--green)">${correctKeys(c).join(", ")}: ${correctKeys(c).map(k => h(c.options[k])).join(" / ")}</div>
         <div class="cite" style="margin-top:7px">❌ ${r.bad||0} ${t("failN")} · ✅ ${r.ok||0} ${t("okN")} · ${t("seen")} ${r.seen||0}</div>
         <div style="margin-top:9px"><button data-open="${c.id}">${t("study")}</button></div>
       </div>`).join("");
@@ -777,7 +877,7 @@ function renderBrowse(el){
         const r = state.cards[c.id] || {};
         return `<div class="box"><b>${stars.has(c.id) ? "★ " : ""}${c.id} · ${c.trap.kind} · ${c.difficulty}</b>
           <div style="font-weight:600;margin-bottom:6px">${h(c.question)}</div>
-          <div style="color:var(--green)">${c.correct}: ${h(c.options[c.correct])}</div>
+          <div style="color:var(--green)">${correctKeys(c).join(", ")}: ${correctKeys(c).map(k => h(c.options[k])).join(" / ")}</div>
           <div style="margin-top:6px">${h(c["why_correct_" + (lang==="en"?"en":"es")] || c.why_correct_es)}</div>
           <div class="cite" style="margin-top:6px">${t("seen")} ${r.seen||0} · ✅${r.ok||0} ❌${r.bad||0}</div></div>`;
       }).join("");
