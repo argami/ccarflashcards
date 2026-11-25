@@ -534,8 +534,9 @@ function paintFilters(){
         `<label class="chk"><input type="checkbox" data-trap="${k}">${k} <span style="opacity:.6">(${n})</span></label>`).join("");
     pt.dataset.key = key;
   }
+  // ticked = explicitly picked; nothing ticked means every trap is in play
   pt.querySelectorAll("input[data-trap]").forEach(b =>
-    b.checked = !f.traps.length || f.traps.includes(b.dataset.trap));
+    b.checked = f.traps.includes(b.dataset.trap));
   wireFilters();          // panels are rebuilt on every open: rebind them here
 }
 
@@ -589,9 +590,9 @@ function wireFilters(){
   });
   document.querySelectorAll("#panelTrap input[data-trap]").forEach(inp => inp.onchange = () => {
     const f = filters(), k = inp.dataset.trap;
-    let cur = f.traps.length ? [...f.traps] : [...TRAPS];
-    cur = inp.checked ? [...new Set([...cur, k])] : cur.filter(x => x !== k);
-    f.traps = cur.length === TRAPS.length ? [] : cur.sort();
+    f.traps = inp.checked
+      ? [...new Set([...f.traps, k])].sort()
+      : f.traps.filter(x => x !== k);
     // no repaint here: rebuilding the panel would detach the boxes mid-click
     dealDeck(); document.getElementById("lblTrap").textContent =
       f.traps.length ? `${t("traps")} · ${f.traps.length}` : t("traps");
