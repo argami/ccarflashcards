@@ -497,7 +497,7 @@ const T = {
       theme:"Tema",light:"Claro",dark:"Oscuro",
       allSub:"Temas",traps:"Trampas",domainAll:"Todo el dominio",
       domains:"Tema",shuffle:"Barajar",deal:"Nuevo mazo",
-      empty:"Nada que repartir con estos filtros.",inQueue:"en el mazo",seen:"vista",streak:"racha",
+      empty:"Nada que repartir con estos filtros.",inQueue:"en el mazo",seen:"vista",seenN:"vistas",streak:"racha",
       best:"mejor",inFilter:"cartas en el filtro",deckOf:"de",
       report:"Informar de un fallo",reportTip:"Abre un issue en GitHub con esta carta ya rellenada",
       repoStar:"★ Like",repoStarTip:"Abre el repositorio en GitHub: ahí se le da a Like",
@@ -536,7 +536,7 @@ const T = {
       theme:"Theme",light:"Light",dark:"Dark",
       allSub:"Topics",traps:"Traps",domainAll:"Whole domain",
       domains:"Topic",shuffle:"Shuffle",deal:"New deck",
-      empty:"Nothing to deal with these filters.",inQueue:"in deck",seen:"seen",streak:"streak",
+      empty:"Nothing to deal with these filters.",inQueue:"in deck",seen:"seen",seenN:"seen",streak:"streak",
       best:"best",inFilter:"cards in filter",deckOf:"of",
       report:"Report a problem",reportTip:"Opens a GitHub issue pre-filled with this card",
       repoStar:"★ Like",repoStarTip:"Opens the repository on GitHub — that is where you hit Like",
@@ -578,9 +578,6 @@ const tL = k => T[lang === "en" ? "en" : "es"][k];
 let state = loadProgress();
 let deck  = loadDeck();
 let view  = {tab:"study", open:null, answered:false, picked:null};
-/* lo contestado en esta pestaña: la tira de estado no puede enseñar ceros
-   en la carta 9 solo porque esa carta en concreto es nueva */
-let sess  = {ok:0, ko:0};
 
 function loadProgress(){
   try{ return JSON.parse(localStorage.getItem(KEY)) || {cards:{}, streak:0, best:0}; }
@@ -923,6 +920,10 @@ function renderStudy(el){
   }
   if(deck.idx >= deck.ids.length) return renderDone(el);
   const c = curCard(), r = rec(c.id), total = deck.ids.length;
+  /* totales del mazo, no de la carta: sobreviven a recargar y a sincronizar */
+  const tot = {vistos:0, ok:0, bad:0};
+  for(const id in state.cards){ const x = state.cards[id] || {};
+    if((x.ok|0) + (x.bad|0) > 0){ tot.vistos++; tot.ok += x.ok|0; tot.bad += x.bad|0; } }
   if(!view.answered && deck.answers[c.id]){ view.answered = true; view.picked = deck.answers[c.id]; }
   const starred = stars.has(c.id);
 
@@ -933,8 +934,9 @@ function renderStudy(el){
       <div class="status">
         <div class="pos"><b>${deck.idx+1}</b><span>/${total}</span></div>
         <div class="st">
-          <span class="m ok">✅ <b>${sess.ok}</b></span>
-          <span class="m ko">❌ <b>${sess.ko}</b></span>
+          <span class="m">${t("seenN")} <b>${tot.vistos}</b></span>
+          <span class="m ok">✅ <b>${tot.ok}</b></span>
+          <span class="m ko">❌ <b>${tot.bad}</b></span>
           <span class="m str">⚡ <b>${state.streak}</b></span>
           <span class="m">${t("best")} <b>${state.best}</b></span>
         </div>
@@ -1046,8 +1048,8 @@ function recordAnswer(c, picked){
   deck.answers[c.id] = picked; saveDeck();
   const ok = isRight(c, picked);
   r.seen++;
-  if(ok){ r.ok++; sess.ok++; state.streak++; state.best = Math.max(state.best, state.streak); }
-  else { r.bad++; sess.ko++; state.streak = 0; }
+  if(ok){ r.ok++; state.streak++; state.best = Math.max(state.best, state.streak); }
+  else { r.bad++; state.streak = 0; }
   save(); syncAutoStart(); queueSync();
   render();
 }
@@ -1120,7 +1122,7 @@ function renderStats(el){
     <div class="rows">${rowsOf(byTrap) || `<div class="cite">${t("noData")}</div>`}</div>
     <div style="margin-top:26px"><button id="reset">${t("reset")}</button></div>`;
   document.getElementById("reset").onclick = () => {
-    if(confirm(t("confirmReset"))){ state={cards:{},streak:0,best:0}; sess={ok:0,ko:0}; save(); deck.answers={}; saveDeck(); queueSync(); render(); }
+    if(confirm(t("confirmReset"))){ state={cards:{},streak:0,best:0}; save(); deck.answers={}; saveDeck(); queueSync(); render(); }
   };
   document.getElementById("foot").textContent = `${DATA.cards.length} ${t("total")}`;
 }
