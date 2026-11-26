@@ -578,6 +578,9 @@ const tL = k => T[lang === "en" ? "en" : "es"][k];
 let state = loadProgress();
 let deck  = loadDeck();
 let view  = {tab:"study", open:null, answered:false, picked:null};
+/* lo contestado en esta pestaña: la tira de estado no puede enseñar ceros
+   en la carta 9 solo porque esa carta en concreto es nueva */
+let sess  = {ok:0, ko:0};
 
 function loadProgress(){
   try{ return JSON.parse(localStorage.getItem(KEY)) || {cards:{}, streak:0, best:0}; }
@@ -930,9 +933,8 @@ function renderStudy(el){
       <div class="status">
         <div class="pos"><b>${deck.idx+1}</b><span>/${total}</span></div>
         <div class="st">
-          <span class="m">${t("seen")} <b>${r.seen}</b></span>
-          <span class="m ok">✅ <b>${r.ok}</b></span>
-          <span class="m ko">❌ <b>${r.bad}</b></span>
+          <span class="m ok">✅ <b>${sess.ok}</b></span>
+          <span class="m ko">❌ <b>${sess.ko}</b></span>
           <span class="m str">⚡ <b>${state.streak}</b></span>
           <span class="m">${t("best")} <b>${state.best}</b></span>
         </div>
@@ -946,6 +948,7 @@ function renderStudy(el){
     <div class="meta"><span class="pill">D${c.domain} · ${c.subdomain}</span>
       <span class="pill">${c.difficulty}</span>
       <span class="pill">${c.trap.kind}</span>` +
+      (r.seen ? `<span class="pill">${t("seen")} ${r.seen} · ${r.ok} ✓ ${r.bad} ✗</span>` : "") +
       (isMulti(c) ? `<span class="pill">${t("selectN")} ${c.select_n}</span>` : "") +
       (c.scenario_ref ? `<span class="pill">${SCENARIOS[c.scenario_ref] || c.scenario_ref}</span>` : "") +
       `<a class="rep" href="${reportUrl(c)}" target="_blank" rel="noopener noreferrer" title="${t("reportTip")}">⚑ ${t("report")}</a></div>
@@ -1043,8 +1046,8 @@ function recordAnswer(c, picked){
   deck.answers[c.id] = picked; saveDeck();
   const ok = isRight(c, picked);
   r.seen++;
-  if(ok){ r.ok++; state.streak++; state.best = Math.max(state.best, state.streak); }
-  else { r.bad++; state.streak = 0; }
+  if(ok){ r.ok++; sess.ok++; state.streak++; state.best = Math.max(state.best, state.streak); }
+  else { r.bad++; sess.ko++; state.streak = 0; }
   save(); syncAutoStart(); queueSync();
   render();
 }
@@ -1117,7 +1120,7 @@ function renderStats(el){
     <div class="rows">${rowsOf(byTrap) || `<div class="cite">${t("noData")}</div>`}</div>
     <div style="margin-top:26px"><button id="reset">${t("reset")}</button></div>`;
   document.getElementById("reset").onclick = () => {
-    if(confirm(t("confirmReset"))){ state={cards:{},streak:0,best:0}; save(); deck.answers={}; saveDeck(); queueSync(); render(); }
+    if(confirm(t("confirmReset"))){ state={cards:{},streak:0,best:0}; sess={ok:0,ko:0}; save(); deck.answers={}; saveDeck(); queueSync(); render(); }
   };
   document.getElementById("foot").textContent = `${DATA.cards.length} ${t("total")}`;
 }
@@ -1368,8 +1371,16 @@ function snap(){
 
 function applySnap(s){
   if(!s || typeof s !== "object") return;
-  if(s.cards && typeof s.cards === "object") state.cards = s.cards;
-  state.streak = Number(s.streak) || 0;
+  if(s.cards && typeof s.cards === "object"){
+    for(const id in s.cards){
+      const x = state.cards[id] || {box:0,due:0,seen:0,ok:0,bad:0}, y = s.cards[id] || {};
+      const ok = Math.max(x.ok | 0, y.ok | 0), bad = Math.max(x.bad | 0, y.bad | 0);
+      state.cards[id] = { box:Math.max(x.box | 0, y.box | 0),
+                          due:Math.max(Number(x.due) || 0, Number(y.due) || 0),
+                          seen:ok + bad, ok, bad };
+    }
+  }
+  state.streak = Math.max(Number(state.streak) || 0, Number(s.streak) || 0);
   state.best   = Math.max(Number(state.best) || 0, Number(s.best) || 0);
   if(Array.isArray(s.stars)){ stars = new Set(s.stars); try{ localStorage.setItem(SKEY, JSON.stringify([...stars])); }catch(e){} }
   let setLang = false;
@@ -1417,7 +1428,7 @@ function mergeSnap(a, b){
   out.cards = compactCards(cards);
   out.stars = [...new Set([...(a.stars || []), ...(b.stars || [])])];
   out.best = Math.max(a.best | 0, b.best | 0);
-  out.streak = (Number(b.ts) || 0) > (Number(a.ts) || 0) ? (b.streak | 0) : (a.streak | 0);
+  out.streak = Math.max(a.streak | 0, b.streak | 0);
   out.set = (Number(b.sts) || 0) > (Number(a.sts) || 0) ? b.set : a.set;
   out.sts = Math.max(Number(a.sts) || 0, Number(b.sts) || 0);
   const da = a.deck || {}, db = b.deck || {};
