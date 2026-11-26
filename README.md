@@ -11,7 +11,7 @@ guide and the publicly available lesson pages, with every citation an exact quot
 | File | |
 |---|---|
 | `index.html` | landing page (English by default, ES/EN toggle) |
-| `ccarflashcards.html` | the study app — one self-contained file, no server, no CDN, works from `file://` |
+| `ccarflashcards.html` | the study app — one self-contained file, no server, works from `file://` (the only outbound request is the optional Cloudflare Web Analytics beacon) |
 | `ccarflashcards.apkg` | the same 347 cards as an Anki deck (model v2, 21 fields, 5 sub-decks) |
 | `.nojekyll` | tells GitHub Pages to serve the files as-is |
 
