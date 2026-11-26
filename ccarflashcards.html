@@ -524,6 +524,7 @@ const T = {
       syncForget:"Olvidar", syncForgetQ:"¿Olvidar el código en este navegador? El progreso guardado en el servicio no se borra, pero tendrás que volver a pegar el código.",
       syncSave:"Guardar código", syncJoin:"Pega aquí el código del otro navegador y pulsa Guardar.",
       syncHave:"Pega este código en el otro navegador para seguir donde lo dejaste.",
+      syncAuto:"Se creó solo al responder tu primera pregunta, para que no pierdas el progreso. Apúntalo si quieres seguir en otro navegador.",
       syncNever:"Todavía no se ha sincronizado",
       syncBusy:"Sincronizando…", syncAgo:"Sincronizado hace ", syncNowAgo:"ahora mismo",
       syncErr:"No se pudo sincronizar", syncOffline:"Sin conexión; se reintentará solo.",
@@ -562,6 +563,7 @@ const T = {
       syncForget:"Forget", syncForgetQ:"Forget the code on this browser? The progress stored in the service is not deleted, but you will have to paste the code again.",
       syncSave:"Save code", syncJoin:"Paste the code from your other browser here and press Save.",
       syncHave:"Paste this code in your other browser to pick up where you left off.",
+      syncAuto:"Created on its own when you answered your first question, so nothing gets lost. Keep it if you want to continue in another browser.",
       syncNever:"Never synced yet",
       syncBusy:"Syncing…", syncAgo:"Synced ", syncNowAgo:"just now",
       syncErr:"Could not sync", syncOffline:"Offline; it will retry by itself.",
@@ -1043,7 +1045,7 @@ function recordAnswer(c, picked){
   r.seen++;
   if(ok){ r.ok++; state.streak++; state.best = Math.max(state.best, state.streak); }
   else { r.bad++; state.streak = 0; }
-  save(); queueSync();
+  save(); syncAutoStart(); queueSync();
   render();
 }
 function pick(k){
@@ -1523,6 +1525,19 @@ function syncNewCode(){
   return [...bytes].map(b => CROCK[b & 31]).join("");
 }
 
+/* Sin código todavía: nace solo en cuanto hay algo que guardar (primera
+   respuesta), para que nadie pierda el progreso por no haber pedido sync. */
+function syncAutoStart(){
+  try{
+    if(sync.code || sync.noauto) return false;
+    if(!syncBase()) return false;
+    sync = { code:syncNewCode(), rev:0, last:0, auto:true };
+    saveSync(); paintSyncTick();
+    syncOnce(false);
+    return true;
+  }catch(e){ return false; }
+}
+
 function agoText(ts){
   if(!ts) return t("syncNever");
   const sec = Math.max(0, Math.round((Date.now() - ts) / 1000));
@@ -1563,6 +1578,7 @@ function paintSync(){
 
   if(sync.code){
     body.innerHTML = `<div class="synccode" id="syncCodeBox">${syncCodeFmt(sync.code)}</div>
+      ${sync.auto ? `<p class="synchelp">${t("syncAuto")}</p>` : ""}
       <div class="syncrow">
         <button id="syncCopy">${t("syncCopy")}</button>
         <button id="syncNow">${t("syncNow")}</button>
@@ -1582,7 +1598,7 @@ function paintSync(){
     };
     document.getElementById("syncNow").onclick = () => syncOnce(true);
     document.getElementById("syncForget").onclick = () => {
-      if(confirm(t("syncForgetQ"))){ sync = {}; saveSync(); paintSync(); paintSyncTick(); }
+      if(confirm(t("syncForgetQ"))){ sync = { noauto:true }; saveSync(); paintSync(); paintSyncTick(); }
     };
   } else {
     body.innerHTML = `<div class="syncrow">

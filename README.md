@@ -37,8 +37,9 @@ Controls sit **above** the card — back, repeat, star, next — so you never sc
 on; `space` also advances. Language, theme, filters and deck position persist in `localStorage` for that
 browser, and per-card scheduling is a Leitner ladder (0-1-3-7-16 days).
 
-**Across devices, without an account.** The ☰ menu has **Sync**: it gives you a code like `XXXXX-XXXXX`
-(10 characters, no email, no password). Paste that code in the same app on another browser and both stay
+**Across devices, without an account.** The first time you answer a question, the app quietly creates a
+sync code for you, so the progress you are about to make is already backed up. The ☰ menu under **Sync**
+shows it: `XXXXX-XXXXX`, 10 characters, no email, no password. Paste that code in the same app on another browser and both stay
 in step — progress, stars, the deck in play and your settings. Writes go up 5 seconds after you answer
 something; the service merges the two sides instead of overwriting, so nothing is lost. The code is the
 only credential: no code, no recovery. Everything still works offline — sync is a bonus layer, and
