@@ -1431,9 +1431,29 @@ function mergeSnap(a, b){
   return out;
 }
 
+const DEVKEY = "ccarf_dev_v1";
+function devId(){
+  try{
+    let d = localStorage.getItem(DEVKEY);
+    if(/^[0-9a-f]{16}$/.test(d || "")) return d;
+    const b = new Uint8Array(8);
+    if(window.crypto && crypto.getRandomValues) crypto.getRandomValues(b);
+    else for(let i = 0; i < 8; i++) b[i] = Math.floor(Math.random() * 256);
+    d = [...b].map(x => x.toString(16).padStart(2, "0")).join("");
+    localStorage.setItem(DEVKEY, d);
+    return d;
+  }catch(e){ return ""; }
+}
+function devHeaders(extra){
+  const h = Object.assign({}, extra || {});
+  const d = devId();
+  if(d) h["x-dev"] = d;
+  return h;
+}
+
 async function syncPull(){
   const base = syncBase(); if(!base || !sync.code) return null;
-  const r = await fetch(base + "/s/" + sync.code, { cache:"no-store" });
+  const r = await fetch(base + "/s/" + sync.code, { cache:"no-store", headers:devHeaders() });
   if(r.status === 404) return { rev:0, payload:null };
   if(!r.ok) throw new Error("HTTP " + r.status);
   const j = await r.json();
@@ -1442,7 +1462,7 @@ async function syncPull(){
 async function syncPush(rev, payload){
   const base = syncBase();
   const r = await fetch(base + "/s/" + sync.code, {
-    method:"PUT", headers:{ "content-type":"application/json" }, cache:"no-store",
+    method:"PUT", headers:devHeaders({ "content-type":"application/json" }), cache:"no-store",
     body:JSON.stringify({ rev, payload }),
   });
   if(r.status === 409){
@@ -1506,7 +1526,7 @@ addEventListener("pagehide", () => {
   if(!sync.code || !syncDirty) return;
   try{
     const body = JSON.stringify({ rev:sync.rev | 0, payload:snap() });
-    fetch(syncBase() + "/s/" + sync.code, { method:"PUT", headers:{ "content-type":"application/json" },
+    fetch(syncBase() + "/s/" + sync.code, { method:"PUT", headers:devHeaders({ "content-type":"application/json" }),
       body, keepalive:true }).catch(() => {});
   }catch(e){}
 });
